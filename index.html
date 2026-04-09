@@ -3,94 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Crabacode · RENDIMIENTO VITAL</title>
+    <title>Crabacode · RENDIMIENTO VITAL + CARDIO</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
         body{background:#0a0f1a;font-family:system-ui,sans-serif;padding:20px 16px 40px;color:#eef2ff;touch-action:pan-y pinch-zoom}
         .app{max-width:550px;margin:0 auto}
         h1{font-size:1.6rem;background:linear-gradient(135deg,#a3e4c2,#f0a3c2);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
-        .sub{text-align:center;color:#9aaec5;font-size:0.75rem;margin:4px 0 12px}
+        .sub{text-align:center;color:#9aaec5;font-size:0.7rem;margin:4px 0 12px}
         
-        /* Cabecera de estado vital */
-        .vital-stats{background:#0c1422;border-radius:40px;padding:12px 16px;margin-bottom:16px;border:1px solid #2a3748}
-        .vital-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-        .vital-item{background:#1a2538;padding:4px 12px;border-radius:40px;font-size:0.75rem}
-        .vital-highlight{color:#f0a3c2;font-weight:bold}
-        .streak-fire{color:#ffaa44}
+        /* BARRA SEMANAL DE CARDIO - NUEVO SISTEMA */
+        .cardio-bar-section{background:linear-gradient(135deg,#0c1422,#0a0f18);border-radius:32px;padding:14px 16px;margin-bottom:16px;border:1px solid #3a5a6a}
+        .cardio-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+        .cardio-title{font-weight:bold;color:#a3e4c2;font-size:0.85rem}
+        .cardio-stats{font-size:0.7rem;background:#1a2538;padding:4px 12px;border-radius:40px}
+        .bar-container{background:#1a2538;border-radius:30px;height:24px;overflow:hidden;margin:10px 0}
+        .bar-fill{background:linear-gradient(90deg,#2b6e4f,#6ea8fe);width:0%;height:100%;border-radius:30px;transition:width 0.3s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:white;font-size:0.7rem;font-weight:bold}
+        .cardio-level{display:flex;justify-content:space-between;margin:8px 0;font-size:0.65rem}
+        .level-dot{width:8px;height:8px;border-radius:10px;display:inline-block;margin-right:4px}
+        .level-activacion{background:#8b6b3a}
+        .level-saludable{background:#c4a03a}
+        .level-optimo{background:#2b6e4f}
+        .level-bonus{background:#f0a3c2}
+        .cardio-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+        .cardio-btn{background:#1f3b4c;border:none;padding:10px 16px;border-radius:40px;color:white;font-size:0.75rem;flex:1;text-align:center;touch-action:manipulation}
+        .cardio-btn:active{transform:scale(0.96);background:#2e5a6e}
+        .reward-badge{background:#f0a3c220;border:1px solid #f0a3c2;border-radius:40px;padding:6px 12px;margin-top:10px;font-size:0.7rem;text-align:center}
         
-        /* Bonus card */
-        .bonus-card{background:linear-gradient(135deg,#1f2a3a,#0f172a);border-radius:32px;padding:12px 16px;margin-bottom:16px;border:1px solid #f0a3c260;cursor:pointer;transition:0.1s}
-        .bonus-card:active{transform:scale(0.98)}
-        .bonus-title{font-weight:bold;color:#f0a3c2;display:flex;justify-content:space-between}
-        .bonus-desc{font-size:0.7rem;color:#bbd4f0;margin-top:4px}
-        
+        .vital-stats{background:#0c1422;border-radius:32px;padding:10px 14px;margin-bottom:16px;border:1px solid #2a3748}
+        .vital-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;font-size:0.7rem}
         .card{background:#111827;border-radius:40px;overflow:hidden;border:1px solid #2a3748;margin-bottom:20px}
-        .header-card{background:#0f172a;padding:14px 18px 10px}
-        .titulo{font-size:1.3rem;font-weight:700;color:#c4f0da;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
-        .badge{background:#1f3b4c;padding:3px 10px;border-radius:40px;font-size:0.7rem}
-        .target{background:#1a2538;margin:10px 16px 0;padding:10px 14px;border-radius:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-        .reps{background:#2c6e4f;padding:3px 14px;border-radius:60px;font-weight:600;font-size:0.8rem}
-        .desc{color:#bbd4f0;font-size:0.75rem}
-        .img-area{display:flex;justify-content:center;padding:12px 16px 6px;background:#0a0f18}
-        .img-area img{max-width:100%;max-height:160px;border-radius:20px;background:#1a2538;padding:6px;object-fit:contain}
-        .timer-area{text-align:center;padding:6px 16px 18px}
-        .timer-circle{background:#0f172a;width:140px;height:140px;margin:8px auto;border-radius:999px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #2a4c6e;transition:all 0.2s}
+        .header-card{background:#0f172a;padding:12px 16px 8px}
+        .titulo{font-size:1.2rem;font-weight:700;color:#c4f0da;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+        .badge{background:#1f3b4c;padding:3px 10px;border-radius:40px;font-size:0.65rem}
+        .target{background:#1a2538;margin:8px 14px 0;padding:8px 12px;border-radius:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+        .reps{background:#2c6e4f;padding:2px 12px;border-radius:60px;font-size:0.75rem}
+        .desc{color:#bbd4f0;font-size:0.7rem}
+        .img-area{display:flex;justify-content:center;padding:10px 14px 4px}
+        .img-area img{max-width:100%;max-height:140px;border-radius:20px;background:#1a2538;padding:6px}
+        .timer-area{text-align:center;padding:6px 14px 16px}
+        .timer-circle{background:#0f172a;width:130px;height:130px;margin:6px auto;border-radius:999px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #2a4c6e}
         .kegel-contract .timer-circle{background:#4a1f2f;border-color:#ff6b8a}
         .kegel-relax .timer-circle{background:#1f3f4a;border-color:#6ea8fe}
-        .timer-num{font-size:2.4rem;font-weight:800;font-family:monospace;color:#b9f3e0}
-        .timer-label{font-size:0.65rem;color:#8db5d6}
-        .progress-badge{background:#1a2c3f;padding:5px 12px;border-radius:40px;display:inline-block;margin:8px 0;font-size:0.75rem}
-        .counter-area{display:flex;align-items:center;justify-content:center;gap:25px;margin:15px 0}
-        .counter-btn{background:#2d3e54;border:none;font-size:2.2rem;width:80px;height:80px;border-radius:60px;color:white;cursor:pointer;font-weight:bold;touch-action:manipulation}
-        .counter-btn:active{transform:scale(0.95)}
-        .counter-value{font-size:3rem;font-weight:800;min-width:80px;text-align:center;color:#a3e4c2}
-        .reps-touch-zone{margin:8px 0;background:rgba(30,40,55,0.4);border-radius:60px;padding:6px 0}
-        .touch-hint{font-size:0.7rem;background:#1a2c3f;display:inline-block;padding:3px 12px;border-radius:60px;margin-bottom:8px}
-        .split-zone{display:flex;gap:12px}
-        .half-zone-left,.half-zone-right{flex:1;text-align:center;padding:10px 0;border-radius:50px;background:#1a2538;font-size:0.75rem;touch-action:manipulation}
-        .half-zone-left:active,.half-zone-right:active{background:#2e405b}
-        .buttons{display:flex;gap:12px;justify-content:center;margin:12px 0 6px}
-        button{padding:10px 20px;border-radius:60px;font-weight:600;touch-action:manipulation}
-        .btn-primary{background:#2b6e4f;color:white}
-        .btn-secondary{background:#2d3e54;color:#eef2ff}
-        .complete-btn{background:#1f6392;color:white;width:85%;margin:8px auto 16px;padding:12px;display:block}
-        .progress-section{background:#0e1622;border-radius:28px;padding:14px;margin-top:14px}
-        .list-item{background:#0f1825;border-radius:60px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem}
-        .list-item.completed{background:#1a3a2e;text-decoration:line-through;color:#9bc0ad}
-        .reset-btn{background:#0e1622;border:1px solid #3a4c62;padding:10px;border-radius:40px;margin-top:14px;width:100%}
-        .history-section{background:#0e1622;border-radius:28px;padding:14px;margin-top:14px}
-        .history-stats{display:flex;gap:12px;margin-bottom:10px;font-size:0.7rem}
-        .stat-card{background:#1a2538;padding:6px 8px;border-radius:20px;flex:1;text-align:center}
-        .history-list{max-height:130px;overflow-y:auto;font-size:0.7rem}
-        .history-item{background:#0f1825;padding:5px 8px;margin:3px 0;border-radius:20px;display:flex;justify-content:space-between}
-        .day-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.65rem;margin-right:6px}
-        .day-fuerte{background:#8b3a3a}
-        .day-liviano{background:#3a5a8b}
-        .day-recuperacion{background:#3a6b4a}
-        footer{text-align:center;font-size:0.6rem;color:#5f7f9e;margin-top:20px}
+        .timer-num{font-size:2.2rem;font-weight:800;font-family:monospace}
+        .timer-label{font-size:0.6rem}
+        .progress-badge{background:#1a2c3f;padding:4px 10px;border-radius:40px;display:inline-block;margin:6px 0;font-size:0.7rem}
+        .counter-area{display:flex;align-items:center;justify-content:center;gap:20px;margin:12px 0}
+        .counter-btn{background:#2d3e54;width:70px;height:70px;border-radius:60px;font-size:2rem}
+        .counter-value{font-size:2.5rem;min-width:70px}
+        .reps-touch-zone{margin:6px 0;background:rgba(30,40,55,0.4);border-radius:50px;padding:5px 0}
+        .touch-hint{font-size:0.65rem}
+        .split-zone{display:flex;gap:10px}
+        .half-zone-left,.half-zone-right{flex:1;text-align:center;padding:8px 0;border-radius:40px;background:#1a2538;font-size:0.7rem}
+        .buttons{display:flex;gap:10px;justify-content:center;margin:10px 0 4px}
+        button{padding:8px 18px;border-radius:60px;font-weight:600}
+        .btn-primary{background:#2b6e4f}
+        .complete-btn{background:#1f6392;width:85%;margin:6px auto 12px;padding:10px}
+        .progress-section{background:#0e1622;border-radius:28px;padding:12px;margin-top:12px}
+        .list-item{background:#0f1825;border-radius:60px;padding:6px 12px;display:flex;justify-content:space-between;margin-bottom:5px;font-size:0.75rem}
+        .list-item.completed{background:#1a3a2e;text-decoration:line-through}
+        .reset-btn{background:#0e1622;border:1px solid #3a4c62;padding:8px;border-radius:40px;margin-top:12px;width:100%}
+        .history-section{background:#0e1622;border-radius:28px;padding:12px;margin-top:12px}
+        .history-stats{display:flex;gap:10px;margin-bottom:8px;font-size:0.65rem}
+        .stat-card{background:#1a2538;padding:4px 6px;border-radius:20px;flex:1;text-align:center}
+        .history-list{max-height:120px;overflow-y:auto;font-size:0.65rem}
+        .history-item{background:#0f1825;padding:4px 8px;margin:3px 0;border-radius:20px;display:flex;justify-content:space-between}
+        footer{text-align:center;font-size:0.55rem;color:#5f7f9e;margin-top:16px}
     </style>
 </head>
 <body>
 <div class="app">
     <h1>🦀 RENDIMIENTO VITAL</h1>
-    <div class="sub">bajar presión · energía · rendimiento sexual</div>
+    <div class="sub">bajar presión · circulación · energía · rendimiento sexual</div>
 
-    <!-- Estado vital y racha -->
-    <div class="vital-stats" id="vitalStats">
-        <div class="vital-row">
-            <span class="vital-item">❤️ Presión <span id="pressureStatus">⚖️ estable</span></span>
-            <span class="vital-item">🔄 Circulación <span id="circulationStatus">🌊 buena</span></span>
-            <span class="vital-item">⚡ Energía <span id="energyStatus">✨ activa</span></span>
+    <!-- BARRA SEMANAL DE CARDIO (nuevo sistema) -->
+    <div class="cardio-bar-section">
+        <div class="cardio-header">
+            <span class="cardio-title">🌙 CARDIO NOCTURNO (elíptica)</span>
+            <span class="cardio-stats" id="cardioStats">0 / 90 min esta semana</span>
         </div>
-        <div class="vital-row">
-            <span class="vital-item">🔥 Racha: <strong id="streakDisplay">0</strong> días</span>
-            <span class="vital-item">🏆 Mejor: <strong id="bestStreakDisplay">0</strong></span>
-            <span class="vital-item">🎯 Semana: <strong id="weekProgress">0</strong>/7</span>
+        <div class="bar-container">
+            <div class="bar-fill" id="cardioBarFill">0%</div>
         </div>
+        <div class="cardio-level">
+            <span><span class="level-dot level-activacion"></span>Activación</span>
+            <span><span class="level-dot level-saludable"></span>Saludable</span>
+            <span><span class="level-dot level-optimo"></span>Óptimo</span>
+            <span><span class="level-dot level-bonus"></span>Bonus Pro</span>
+        </div>
+        <div class="cardio-actions">
+            <button class="cardio-btn" id="add5minBtn">+5 min</button>
+            <button class="cardio-btn" id="add10minBtn">+10 min</button>
+            <button class="cardio-btn" id="add15minBtn">+15 min</button>
+            <button class="cardio-btn" id="resetCardioBtn">⟳ Reset semana</button>
+        </div>
+        <div id="cardioReward" class="reward-badge" style="display:none"></div>
     </div>
 
-    <!-- Tarjeta de Bonus (si está disponible) -->
-    <div id="bonusContainer" style="display:none"></div>
+    <!-- Estado vital -->
+    <div class="vital-stats">
+        <div class="vital-row">
+            <span>❤️ Presión: <strong id="pressureStatus">⚖️ estable</strong></span>
+            <span>🔄 Circulación: <strong id="circulationStatus">🌊 buena</strong></span>
+            <span>⚡ Energía: <strong id="energyStatus">✨ activa</strong></span>
+        </div>
+        <div class="vital-row">
+            <span>🔥 Racha: <strong id="streakDisplay">0</strong> días</span>
+            <span>🏆 Mejor: <strong id="bestStreakDisplay">0</strong></span>
+            <span>🎯 Semana: <strong id="weekProgress">0</strong>/7</span>
+        </div>
+    </div>
 
     <!-- Tarjeta de ejercicio actual -->
     <div class="card">
@@ -104,14 +125,13 @@
                 <span class="desc" id="targetDesc">Mejora circulación</span>
             </div>
         </div>
-        <div class="img-area"><img id="exerciseImg" src="1.png" onerror="this.src='https://placehold.co/300x160/1a2538/6ea8fe?text=Ejercicio'"></div>
+        <div class="img-area"><img id="exerciseImg" src="1.png" onerror="this.src='https://placehold.co/300x140/1a2538/6ea8fe?text=Ejercicio'"></div>
         <div class="timer-area">
             <div id="timeModeArea"><div class="timer-circle" id="timerCircle"><div class="timer-num" id="timerDisplay">00:00</div><div class="timer-label" id="timerLabel">temporizador</div></div></div>
             <div id="repsModeArea" style="display:none">
-                <div class="reps-touch-zone"><div style="text-align:center"><span class="touch-hint">👈 izquierda resta · derecha suma 👉</span></div>
-                <div class="split-zone"><div class="half-zone-left" id="touchLeftZone">➖ RESTAR</div><div class="half-zone-right" id="touchRightZone">➕ SUMAR</div></div></div>
+                <div class="reps-touch-zone"><div class="split-zone"><div class="half-zone-left" id="touchLeftZone">➖ RESTAR</div><div class="half-zone-right" id="touchRightZone">➕ SUMAR</div></div></div>
                 <div class="counter-area"><button class="counter-btn" id="minusRepBtn">−</button><div class="counter-value" id="repCounter">0</div><button class="counter-btn" id="plusRepBtn">+</button></div>
-                <div><span class="progress-badge">🎯 Objetivo: <span id="targetRepsCount">12</span></span><button class="reset-counter" id="resetRepsBtn" style="background:#4a2f2f;padding:4px 12px;border-radius:40px;margin-left:8px">⟳</button></div>
+                <div><span class="progress-badge">🎯 Objetivo: <span id="targetRepsCount">12</span></span><button class="reset-counter" id="resetRepsBtn" style="background:#4a2f2f;padding:3px 10px;border-radius:40px;margin-left:6px">⟳</button></div>
             </div>
             <div class="progress-badge" id="hint">👟 prepárate</div>
             <div class="buttons"><button class="btn-primary" id="startBtn">▶ Iniciar</button><button class="btn-secondary" id="resetTimerBtn">⟳ Reiniciar</button></div>
@@ -121,20 +141,25 @@
 
     <div class="progress-section"><div class="progress-title">📋 HOY: <span id="completedCount">0</span>/<span id="totalToday">6</span> completados</div><div id="checklist"></div><button class="reset-btn" id="resetDayBtn">🔄 Reiniciar día</button></div>
     <div class="history-section"><div class="history-title">📅 HISTORIAL</div><div class="history-stats"><div class="stat-card">✅ Días<br><strong id="totalDays">0</strong></div><div class="stat-card">🔥 Racha<br><strong id="currentStreak">0</strong></div><div class="stat-card">🏆 Best<br><strong id="bestStreak">0</strong></div></div><div id="historyList" class="history-list"></div></div>
-    <footer>🦀 sistema de rendimiento · constancia = resultados reales</footer>
+    <footer>🌙 Cardio nocturno llena la barra · bonus desbloqueables · constancia = resultados reales</footer>
 </div>
 
 <script>
-    // ==================== RUTINA SEMANAL ====================
+    // ==================== CONFIGURACIÓN ====================
+    const OBJETIVO_SEMANAL = 90; // minutos
+    const MAX_POR_SESION = 20;
+    const MIN_POR_SESION = 5;
+    
+    // Rutina semanal
     const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
     const tiposDia = {
-        1: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"], bonus: false },
-        2: { nombre: "LIVIANO", ejercicios: ["cardio", "rotaciones", "estiramiento", "kegels"], bonus: false },
-        3: { nombre: "FUERTE B", ejercicios: ["cardio", "flexiones", "remo", "kegels", "estiramiento"], bonus: false },
-        4: { nombre: "LIVIANO", ejercicios: ["cardio", "movilidad", "kegels"], bonus: false },
-        5: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"], bonus: false },
-        6: { nombre: "MIX SUAVE", ejercicios: ["cardio", "sentadillas", "flexiones", "kegels"], bonus: false },
-        0: { nombre: "RECUPERACIÓN", ejercicios: ["estiramiento"], bonus: true } // domingo opcional
+        1: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"] },
+        2: { nombre: "LIVIANO", ejercicios: ["cardio", "rotaciones", "estiramiento", "kegels"] },
+        3: { nombre: "FUERTE B", ejercicios: ["cardio", "flexiones", "remo", "kegels", "estiramiento"] },
+        4: { nombre: "LIVIANO", ejercicios: ["cardio", "movilidad", "kegels"] },
+        5: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"] },
+        6: { nombre: "MIX SUAVE", ejercicios: ["cardio", "sentadillas", "flexiones", "kegels"] },
+        0: { nombre: "RECUPERACIÓN", ejercicios: ["estiramiento"] }
     };
     
     const ejerciciosDB = {
@@ -143,25 +168,23 @@
         puente: { nombre: "🍑 PUENTES DE GLÚTEO", img: "3.png", defaultRep: 12, esTiempo: false, texto: "12 repeticiones", desc: "Activa glúteos y core", tipoGamif: "fuerza" },
         rotaciones: { nombre: "🔄 ROTACIONES", img: "4.png", defaultRep: 8, esTiempo: false, texto: "8 reps por lado", desc: "Movilidad de columna", tipoGamif: "control" },
         plancha: { nombre: "💪 PLANCHA", img: "5.png", defaultSeg: 25, esTiempo: true, texto: "25 segundos", desc: "Fortalece todo el core", tipoGamif: "fuerza" },
-        estiramiento: { nombre: "🧘 ESTIRAMIENTO", img: "6.png", defaultSeg: 90, esTiempo: true, texto: "2 minutos", desc: "Relaja músculos y mejora flexibilidad", tipoGamif: "energia" },
-        kegels: { nombre: "🫀 KEGELS (suelo pélvico)", img: "7.png", defaultSeg: 75, esTiempo: true, texto: "10 ciclos", desc: "Mejora control, circulación y rendimiento sexual", tipoGamif: "control", esKegel: true },
-        flexiones: { nombre: "💪 FLEXIONES", img: "2.png", defaultRep: 8, esTiempo: false, texto: "8–12 repeticiones", desc: "Tren superior", tipoGamif: "fuerza" },
-        remo: { nombre: "🧲 REMO (banda/peso)", img: "4.png", defaultRep: 10, esTiempo: false, texto: "10 repeticiones", desc: "Espalda y control", tipoGamif: "fuerza" },
-        movilidad: { nombre: "🔄 MOVILIDAD GENERAL", img: "4.png", defaultSeg: 120, esTiempo: true, texto: "2 minutos", desc: "Articulaciones suaves", tipoGamif: "control" }
+        estiramiento: { nombre: "🧘 ESTIRAMIENTO", img: "6.png", defaultSeg: 90, esTiempo: true, texto: "2 minutos", desc: "Relaja músculos y flexibilidad", tipoGamif: "energia" },
+        kegels: { nombre: "🫀 KEGELS", img: "7.png", defaultSeg: 75, esTiempo: true, texto: "10 ciclos", desc: "Mejora control y rendimiento sexual", tipoGamif: "control", esKegel: true },
+        flexiones: { nombre: "💪 FLEXIONES", img: "2.png", defaultRep: 8, esTiempo: false, texto: "8–12 reps", desc: "Tren superior", tipoGamif: "fuerza" },
+        remo: { nombre: "🧲 REMO", img: "4.png", defaultRep: 10, esTiempo: false, texto: "10 reps", desc: "Espalda y control", tipoGamif: "fuerza" },
+        movilidad: { nombre: "🔄 MOVILIDAD", img: "4.png", defaultSeg: 120, esTiempo: true, texto: "2 minutos", desc: "Articulaciones suaves", tipoGamif: "control" }
     };
     
-    // Progresión global (cada 2 semanas)
-    let progresion = { semana: 0, planchaBonus: 0, repBonus: 0, kegelBonus: 0 };
-    
-    // Estado
-    let currentEjercicioIdx = 0, ejerciciosHoy = [], completadosHoy = [];
+    // Estado global
+    let cardioSemanal = 0;
+    let bonusCardioUsado = false;
+    let ejerciciosHoy = [], completadosHoy = [], currentEjercicioIdx = 0;
     let timer=null, activo=false, tiempoActual=0, objetivo=0, modoTime=true, repActual=0;
     let kegelInterval=null, kegelPhase="relax";
     let gamificacion = { energia:0, fuerza:0, control:0 };
     let historial = [];
-    let rachaActual = 0, mejorRacha = 0;
-    let bonusDisponible = false, bonusTipo = null, bonusUsadoHoy = false;
-    let audioCtx = null;
+    let rachaActual=0, mejorRacha=0;
+    let audioCtx=null;
     
     // DOM
     const dom = {
@@ -180,45 +203,124 @@
         bestStreakDisplay: document.getElementById("bestStreakDisplay"), weekProgress: document.getElementById("weekProgress"),
         totalDays: document.getElementById("totalDays"), currentStreak: document.getElementById("currentStreak"),
         bestStreak: document.getElementById("bestStreak"), historyList: document.getElementById("historyList"),
-        bonusContainer: document.getElementById("bonusContainer"), pressureStatus: document.getElementById("pressureStatus"),
-        circulationStatus: document.getElementById("circulationStatus"), energyStatus: document.getElementById("energyStatus")
+        pressureStatus: document.getElementById("pressureStatus"), circulationStatus: document.getElementById("circulationStatus"),
+        energyStatus: document.getElementById("energyStatus"), cardioStats: document.getElementById("cardioStats"),
+        cardioBarFill: document.getElementById("cardioBarFill"), cardioReward: document.getElementById("cardioReward")
     };
     
     // Helper
-    function getDiaActual() { return new Date().getDay(); }
-    function playBeep() { try { if(!audioCtx) audioCtx=new AudioContext(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.1; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); } catch(e){} }
+    function playBeep(){ try{ if(!audioCtx) audioCtx=new AudioContext(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.08; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); }catch(e){} }
     function vibrateShort(){ if(navigator.vibrate) navigator.vibrate(20); }
     function vibrateKegel(){ if(navigator.vibrate) navigator.vibrate([30,40,30]); }
     
-    // Cargar rutina del día con progresión
-    function cargarRutinaDelDia() {
+    // ==================== SISTEMA CARDIO SEMANAL ====================
+    function cargarCardioSemanal(){
+        const saved = localStorage.getItem("crabacode_cardio_semanal");
+        const semanaGuardada = localStorage.getItem("crabacode_cardio_semana");
+        const hoy = new Date();
+        const numSemana = `${hoy.getFullYear()}-${hoy.getWeek()}`;
+        if(saved && semanaGuardada === numSemana){
+            cardioSemanal = parseInt(saved) || 0;
+        } else {
+            cardioSemanal = 0;
+            localStorage.setItem("crabacode_cardio_semanal", "0");
+            localStorage.setItem("crabacode_cardio_semana", numSemana);
+            bonusCardioUsado = false;
+        }
+        actualizarBarraCardio();
+    }
+    
+    function actualizarBarraCardio(){
+        const porcentaje = Math.min(100, (cardioSemanal / OBJETIVO_SEMANAL) * 100);
+        dom.cardioBarFill.style.width = `${porcentaje}%`;
+        dom.cardioBarFill.innerText = `${Math.floor(porcentaje)}%`;
+        dom.cardioStats.innerText = `${cardioSemanal} / ${OBJETIVO_SEMANAL} min esta semana`;
+        
+        let nivel = "";
+        if(cardioSemanal >= 90) nivel = "🔥 BONUS PRO desbloqueado!";
+        else if(cardioSemanal >= 60) nivel = "🟢 ÓPTIMO · excelente volumen";
+        else if(cardioSemanal >= 30) nivel = "🟡 ZONA SALUDABLE · vas bien";
+        else nivel = "🟤 ACTIVACIÓN · sumá minutos";
+        dom.cardioBarFill.style.background = cardioSemanal>=90 ? "linear-gradient(90deg,#f0a3c2,#ff6b8a)" : "linear-gradient(90deg,#2b6e4f,#6ea8fe)";
+        
+        // Verificar si alcanzó bonus
+        if(cardioSemanal >= OBJETIVO_SEMANAL && !bonusCardioUsado){
+            dom.cardioReward.style.display = "block";
+            dom.cardioReward.innerHTML = "🎁 ¡BONUS DESBLOQUEADO! +1 día bonus o +1 stat · Toca para reclamar";
+            dom.cardioReward.style.cursor = "pointer";
+            dom.cardioReward.onclick = reclamarBonusCardio;
+        } else if(cardioSemanal < OBJETIVO_SEMANAL){
+            dom.cardioReward.style.display = "none";
+        }
+    }
+    
+    function reclamarBonusCardio(){
+        if(bonusCardioUsado) return;
+        const opcion = confirm("🎁 Bonus alcanzado: ¿Qué querés?\n✅ Aceptar → +1 a Energía y Control\n❌ Cancelar → Guardar para otro momento");
+        if(opcion){
+            gamificacion.energia += 1;
+            gamificacion.control += 1;
+            actualizarEstadoVital();
+            bonusCardioUsado = true;
+            dom.cardioReward.innerHTML = "✅ Bonus reclamado: +1 Energía +1 Control";
+            setTimeout(()=>{ dom.cardioReward.style.display = "none"; }, 3000);
+            localStorage.setItem("crabacode_cardio_bonus_usado", "true");
+        }
+    }
+    
+    function agregarMinutosCardio(minutos){
+        if(minutos < MIN_POR_SESION){
+            alert(`Mínimo ${MIN_POR_SESION} minutos para que cuente`);
+            return;
+        }
+        if(minutos > MAX_POR_SESION){
+            alert(`Máximo ${MAX_POR_SESION} minutos por sesión (para evitar fatiga)`);
+            return;
+        }
+        cardioSemanal += minutos;
+        const numSemana = `${new Date().getFullYear()}-${new Date().getWeek()}`;
+        localStorage.setItem("crabacode_cardio_semanal", cardioSemanal.toString());
+        localStorage.setItem("crabacode_cardio_semana", numSemana);
+        actualizarBarraCardio();
+        playBeep();
+        vibrateShort();
+        dom.hint.innerHTML = `🌙 +${minutos} min de cardio nocturno! Llevas ${cardioSemanal}/${OBJETIVO_SEMANAL} min esta semana`;
+        // Bonus adicional: pequeña gamificación
+        if(minutos >= 10){
+            gamificacion.energia += 0.5;
+            actualizarEstadoVital();
+        }
+    }
+    
+    function resetCardioSemana(){
+        if(confirm("¿Reiniciar barra de cardio semanal?")){
+            cardioSemanal = 0;
+            bonusCardioUsado = false;
+            const numSemana = `${new Date().getFullYear()}-${new Date().getWeek()}`;
+            localStorage.setItem("crabacode_cardio_semanal", "0");
+            localStorage.setItem("crabacode_cardio_semana", numSemana);
+            actualizarBarraCardio();
+            dom.hint.innerHTML = "Barra de cardio reiniciada para nueva semana";
+        }
+    }
+    
+    // ==================== RUTINA DIARIA ====================
+    function getDiaActual(){ return new Date().getDay(); }
+    
+    function cargarRutinaDelDia(){
         const dia = getDiaActual();
         const tipo = tiposDia[dia];
         dom.dayBadge.innerHTML = `${diasSemana[dia]} · ${tipo.nombre}`;
-        let ejerciciosClaves = [...tipo.ejercicios];
-        // Aplicar progresión cada 2 semanas
-        const semanasActivas = Math.floor(historial.length / 14);
-        progresion.semana = semanasActivas;
-        const repExtra = Math.min(semanasActivas, 5);
-        const planchaExtra = Math.min(semanasActivas * 5, 15);
-        const kegelExtra = Math.min(semanasActivas, 3);
-        
-        ejerciciosHoy = ejerciciosClaves.map(key => {
-            let base = {...ejerciciosDB[key]};
-            if(key === "plancha") base.defaultSeg = Math.min(25 + planchaExtra, 45);
-            if(key === "sentadillas" || key === "puente" || key === "flexiones" || key === "remo") base.defaultRep = Math.min(base.defaultRep + repExtra, 20);
-            if(key === "kegels") base.defaultSeg = Math.min(75 + kegelExtra*5, 95);
-            return base;
-        });
+        ejerciciosHoy = tipo.ejercicios.map(key => ({...ejerciciosDB[key]}));
         completadosHoy = new Array(ejerciciosHoy.length).fill(false);
         dom.totalToday.innerText = ejerciciosHoy.length;
         return ejerciciosHoy;
     }
     
-    function actualizarChecklist() {
+    function actualizarChecklist(){
         let html = "";
         ejerciciosHoy.forEach((ex, i) => {
-            html += `<div class="list-item ${completadosHoy[i]?'completed':''}" data-idx="${i}"><span>${completadosHoy[i]?'✅':'⭕'} ${ex.nombre}</span><span style="font-size:0.65rem">${ex.texto}</span></div>`;
+            html += `<div class="list-item ${completadosHoy[i]?'completed':''}" data-idx="${i}"><span>${completadosHoy[i]?'✅':'⭕'} ${ex.nombre}</span><span style="font-size:0.6rem">${ex.texto}</span></div>`;
         });
         dom.checklist.innerHTML = html;
         dom.completedCount.innerText = completadosHoy.filter(v=>v).length;
@@ -227,7 +329,7 @@
         });
     }
     
-    function cargarEjercicioActual() {
+    function cargarEjercicioActual(){
         pausarTimer(); resetearEstiloKegel();
         const ex = ejerciciosHoy[currentEjercicioIdx];
         if(!ex) return;
@@ -240,7 +342,7 @@
             dom.timeModeArea.style.display="block";
             dom.repsModeArea.style.display="none";
             objetivo = ex.defaultSeg;
-            dom.timerLabel.innerText = ex.esKegel ? "🔄 Kegels · contrae/relaja" : "⏱️ temporizador";
+            dom.timerLabel.innerText = ex.esKegel ? "🔄 Kegels" : "⏱️ temporizador";
             tiempoActual=0; dom.timerDisplay.innerText="00:00";
             if(ex.esKegel){ dom.hint.innerText="🔵 Prepárate: Kegels"; kegelPhase="relax"; actualizarHintKegel(); }
             else dom.hint.innerText=`🕒 Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
@@ -250,13 +352,13 @@
             objetivo = ex.defaultRep;
             dom.targetRepsCount.innerText = objetivo;
             repActual=0; dom.repCounter.innerText="0";
-            dom.hint.innerText=`🏋️ Toca izquierda/derecha o botones. Objetivo: ${objetivo} reps.`;
+            dom.hint.innerText=`🏋️ Objetivo: ${objetivo} reps`;
         }
         const completado = completadosHoy[currentEjercicioIdx];
-        dom.completeBtn.innerText = completado ? "✅ Ya completado · Siguiente ➜" : "✅ Completado · Siguiente ➜";
+        dom.completeBtn.innerText = completado ? "✅ Ya completado" : "✅ Completado · Siguiente";
         dom.startBtn.disabled = completado;
         dom.resetTimerBtn.disabled = completado;
-        if(!modoTime){ dom.minusRepBtn.disabled=completado; dom.plusRepBtn.disabled=completado; dom.resetRepsBtn.disabled=completado; }
+        if(!modoTime){ dom.minusRepBtn.disabled=completado; dom.plusRepBtn.disabled=completado; }
         activo=false; dom.startBtn.innerText = modoTime ? "▶ Iniciar" : "🎯 Empezar";
     }
     
@@ -275,7 +377,7 @@
                 activo=true; dom.startBtn.innerText="⏸ Pausa";
                 if(ex.esKegel) iniciarKegelLoop();
                 else { if(kegelInterval) clearInterval(kegelInterval); resetearEstiloKegel(); }
-                timer=setInterval(()=>{ if(!activo) return; tiempoActual++; let m=Math.floor(tiempoActual/60), s=tiempoActual%60; dom.timerDisplay.innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(tiempoActual>=objetivo) dom.hint.innerHTML="🎯 ¡Objetivo cumplido!"; else if(!ex.esKegel) dom.hint.innerHTML=`⏳ ${m}:${s.toString().padStart(2,'0')} / ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`; },1000);
+                timer=setInterval(()=>{ if(!activo) return; tiempoActual++; let m=Math.floor(tiempoActual/60), s=tiempoActual%60; dom.timerDisplay.innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(tiempoActual>=objetivo) dom.hint.innerHTML="🎯 ¡Objetivo cumplido!"; else if(!ex.esKegel) dom.hint.innerHTML=`⏳ ${m}:${s.toString().padStart(2,'0')}`; },1000);
             }
         } else dom.hint.innerText="Usa + / - o zonas táctiles";
     }
@@ -285,8 +387,8 @@
         let nuevo=repActual+delta; if(nuevo<0) nuevo=0;
         repActual=nuevo; dom.repCounter.innerText=repActual;
         vibrateShort(); playBeep();
-        if(repActual>=objetivo) dom.hint.innerHTML=`🎯 ¡Objetivo cumplido! (${repActual}/${objetivo}) ✅`;
-        else dom.hint.innerHTML=`🔁 ${repActual}/${objetivo} repeticiones`;
+        if(repActual>=objetivo) dom.hint.innerHTML=`🎯 ¡Cumplido! (${repActual}/${objetivo}) ✅`;
+        else dom.hint.innerHTML=`🔁 ${repActual}/${objetivo}`;
     }
     
     function sumarGamificacion(ex){
@@ -297,12 +399,10 @@
     }
     
     function actualizarEstadoVital(){
-        const totalEnergia = gamificacion.energia;
-        const totalFuerza = gamificacion.fuerza;
-        const totalControl = gamificacion.control;
-        dom.pressureStatus.innerText = totalControl>=5 ? "📉 excelente" : (totalControl>=2 ? "⚖️ estable" : "⚠️ mejorar");
-        dom.circulationStatus.innerText = totalEnergia>=4 ? "🌊 muy buena" : (totalEnergia>=2 ? "🌊 buena" : "🌊 regular");
-        dom.energyStatus.innerText = totalEnergia+totalFuerza>=6 ? "⚡ alta" : (totalEnergia+totalFuerza>=3 ? "✨ media" : "😴 baja");
+        dom.pressureStatus.innerText = gamificacion.control>=5 ? "📉 excelente" : (gamificacion.control>=2 ? "⚖️ estable" : "⚠️ mejorar");
+        dom.circulationStatus.innerText = gamificacion.energia>=4 ? "🌊 muy buena" : (gamificacion.energia>=2 ? "🌊 buena" : "🌊 regular");
+        dom.energyStatus.innerText = gamificacion.energia+gamificacion.fuerza>=6 ? "⚡ alta" : (gamificacion.energia+gamificacion.fuerza>=3 ? "✨ media" : "😴 baja");
+        localStorage.setItem("crabacode_gamificacion", JSON.stringify(gamificacion));
     }
     
     function completarYAvanzar(){
@@ -321,10 +421,9 @@
     
     function finalizarDia(){
         const hoy=new Date().toISOString().split('T')[0];
-        const existe=historial.find(h=>h.fecha===hoy);
-        if(!existe){
-            const completadosTotal = completadosHoy.filter(v=>v).length;
-            historial.push({ fecha:hoy, total:completadosTotal, ejercicios:completadosTotal });
+        if(!historial.some(h=>h.fecha===hoy)){
+            const totalCompletados = completadosHoy.filter(v=>v).length;
+            historial.push({ fecha:hoy, total:totalCompletados });
             historial.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
             localStorage.setItem("crabacode_historial_final", JSON.stringify(historial));
             calcularRachas();
@@ -333,7 +432,6 @@
         dom.completeBtn.innerText="🏆 Finalizado";
         dom.startBtn.disabled=true;
         actualizarHistorialUI();
-        verificarBonusPorRacha();
     }
     
     function avanzarSiguiente(){
@@ -366,72 +464,16 @@
         dom.bestStreak.innerText=mejorRacha;
         const semana=historial.filter(h=>{ const d=new Date(h.fecha); const hoySemana=new Date(); const inicioSemana=new Date(hoySemana); inicioSemana.setDate(hoySemana.getDate()-hoySemana.getDay()); return d>=inicioSemana; }).length;
         dom.weekProgress.innerText=semana;
-        return {rachaActual,mejorRacha};
     }
     
     function actualizarHistorialUI(){
-        const ultimos=historial.slice(0,10);
-        dom.historyList.innerHTML=ultimos.map(h=>`<div class="history-item"><span>📆 ${new Date(h.fecha).toLocaleDateString('es-AR')}</span><span>✅ ${h.total}/${ejerciciosHoy.length} ejercicios</span></div>`).join('');
+        const ultimos=historial.slice(0,8);
+        dom.historyList.innerHTML=ultimos.map(h=>`<div class="history-item"><span>📆 ${new Date(h.fecha).toLocaleDateString('es-AR')}</span><span>✅ ${h.total}/${ejerciciosHoy.length}</span></div>`).join('');
         dom.totalDays.innerText=historial.length;
         calcularRachas();
     }
     
-    function verificarBonusPorRacha(){
-        // Bonus por racha: 3 días → bonus básico, 6 días → bonus pro
-        if(rachaActual>=6 && !bonusUsadoHoy && bonusDisponible===false){
-            bonusDisponible=true;
-            bonusTipo="pro";
-            mostrarBonus();
-        } else if(rachaActual>=3 && !bonusUsadoHoy && bonusDisponible===false){
-            bonusDisponible=true;
-            bonusTipo="basico";
-            mostrarBonus();
-        }
-    }
-    
-    function mostrarBonus(){
-        if(!bonusDisponible) return;
-        const opciones = bonusTipo==="basico" ? 
-            [{nombre:"🟢 Bonus Básico", desc:"Cardio suave 3min + Estiramientos 5min + Kegels 6 ciclos (6-8 min)", tipo:"basico"}] :
-            [{nombre:"🔵 Modo Zen", desc:"Respiración + estiramientos 7min · baja estrés", tipo:"zen"},
-             {nombre:"🔴 Modo Sangre", desc:"Cardio suave 6min · mejora circulación", tipo:"sangre"},
-             {nombre:"⚪ Skip inteligente", desc:"Descanso activo · cuenta como día completado", tipo:"skip"}];
-        dom.bonusContainer.style.display="block";
-        dom.bonusContainer.innerHTML = `<div class="bonus-card" id="bonusCard"><div class="bonus-title">🎁 BONUS DISPONIBLE (racha ${rachaActual} días)</div><div id="bonusOptions"></div><div class="bonus-desc" style="margin-top:8px">⚠️ Máximo 2 por semana · no días seguidos</div></div>`;
-        const optsDiv = document.getElementById("bonusOptions");
-        optsDiv.innerHTML = opciones.map((opt,i)=>`<div class="bonus-opt" data-opt="${i}" style="background:#1f2a3a;margin:6px 0;padding:8px;border-radius:24px;cursor:pointer"><strong>${opt.nombre}</strong><div style="font-size:0.7rem">${opt.desc}</div></div>`).join('');
-        document.querySelectorAll('.bonus-opt').forEach(el=>{
-            el.addEventListener('click',(e)=>{
-                const idx=parseInt(el.dataset.opt);
-                aplicarBonus(opciones[idx]);
-            });
-        });
-    }
-    
-    function aplicarBonus(opt){
-        if(bonusUsadoHoy){ alert("Ya usaste bonus hoy"); return; }
-        bonusUsadoHoy=true;
-        bonusDisponible=false;
-        dom.bonusContainer.style.display="none";
-        // Registrar día como completado con bonus
-        const hoy=new Date().toISOString().split('T')[0];
-        if(!historial.some(h=>h.fecha===hoy)){
-            historial.push({ fecha:hoy, total:ejerciciosHoy.length, bonus:opt.nombre });
-            localStorage.setItem("crabacode_historial_final", JSON.stringify(historial));
-            calcularRachas();
-            actualizarHistorialUI();
-        }
-        dom.hint.innerHTML = `🎁 Bonus "${opt.nombre}" aplicado. Día completado sin esfuerzo.`;
-        dom.completeBtn.innerText = "🏆 Bonus aplicado";
-        dom.startBtn.disabled = true;
-        // Sumar pequeña gamificación según tipo
-        if(opt.tipo==="zen") gamificacion.control+=1;
-        if(opt.tipo==="sangre") gamificacion.energia+=1;
-        actualizarEstadoVital();
-        setTimeout(()=>{ location.reload(); },1500);
-    }
-    
-    function reiniciarDia(){ if(confirm("¿Reiniciar el día?")){ pausarTimer(); cargarRutinaDelDia(); currentEjercicioIdx=0; completadosHoy=new Array(ejerciciosHoy.length).fill(false); actualizarChecklist(); cargarEjercicioActual(); bonusUsadoHoy=false; bonusDisponible=false; dom.bonusContainer.style.display="none"; dom.hint.innerText="🌅 Día reiniciado"; } }
+    function reiniciarDia(){ if(confirm("¿Reiniciar el día?")){ pausarTimer(); cargarRutinaDelDia(); currentEjercicioIdx=0; completadosHoy=new Array(ejerciciosHoy.length).fill(false); actualizarChecklist(); cargarEjercicioActual(); dom.hint.innerText="🌅 Día reiniciado"; } }
     
     // Eventos
     dom.startBtn.onclick=iniciarModo;
@@ -440,17 +482,25 @@
     dom.resetDayBtn.onclick=reiniciarDia;
     dom.plusRepBtn.onclick=()=>actualizarContadorReps(1);
     dom.minusRepBtn.onclick=()=>actualizarContadorReps(-1);
-    dom.resetRepsBtn.onclick=()=>{ repActual=0; dom.repCounter.innerText="0"; dom.hint.innerText=`Conteo reiniciado. Objetivo: ${objetivo} reps`; };
-    if(dom.touchLeftZone) dom.touchLeftZone.onclick=()=>actualizarContadorReps(-1);
-    if(dom.touchRightZone) dom.touchRightZone.onclick=()=>actualizarContadorReps(1);
+    dom.resetRepsBtn.onclick=()=>{ repActual=0; dom.repCounter.innerText="0"; dom.hint.innerText=`Conteo reiniciado`; };
+    if(document.getElementById("touchLeftZone")) document.getElementById("touchLeftZone").onclick=()=>actualizarContadorReps(-1);
+    if(document.getElementById("touchRightZone")) document.getElementById("touchRightZone").onclick=()=>actualizarContadorReps(1);
+    document.getElementById("add5minBtn").onclick=()=>agregarMinutosCardio(5);
+    document.getElementById("add10minBtn").onclick=()=>agregarMinutosCardio(10);
+    document.getElementById("add15minBtn").onclick=()=>agregarMinutosCardio(15);
+    document.getElementById("resetCardioBtn").onclick=resetCardioSemana;
     
-    // Cargar historial guardado
-    const saved=localStorage.getItem("crabacode_historial_final");
-    if(saved){ historial=JSON.parse(saved); calcularRachas(); actualizarHistorialUI(); }
+    // Inicialización
+    Date.prototype.getWeek = function(){ const d=new Date(this); d.setHours(0,0,0,0); d.setDate(d.getDate()+3-(d.getDay()+6)%7); const year=d.getFullYear(); const week=Math.floor((d-new Date(year,0,4))/86400000/7)+1; return week; };
+    const savedGami=localStorage.getItem("crabacode_gamificacion");
+    if(savedGami) gamificacion=JSON.parse(savedGami);
+    const savedHist=localStorage.getItem("crabacode_historial_final");
+    if(savedHist){ historial=JSON.parse(savedHist); calcularRachas(); actualizarHistorialUI(); }
+    cargarCardioSemanal();
     cargarRutinaDelDia();
     actualizarChecklist();
     cargarEjercicioActual();
-    verificarBonusPorRacha();
+    actualizarEstadoVital();
 </script>
 </body>
 </html>
