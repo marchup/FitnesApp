@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Marce · Espartano | Fuego y Gloria</title>
+    <title>Marce · Rendimiento Vital | Espartano</title>
     <style>
         * {
             margin: 0;
@@ -93,17 +93,17 @@
 
         /* TEXTOS BLANCOS Y GRANDES */
         h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             text-align: center;
             color: #FFFFFF;
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin-bottom: 5px;
         }
         .sub {
             text-align: center;
             color: #FFFFFF;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-family: monospace;
             margin-bottom: 20px;
             border-bottom: 2px solid #b8860b;
@@ -367,7 +367,7 @@
         
         footer {
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-top: 20px;
             color: #FFFFFF;
             font-weight: bold;
@@ -384,6 +384,52 @@
             font-weight: bold;
             color: white;
             margin: 10px 0;
+        }
+
+        /* Guía visual para Kegels */
+        .kegel-guide {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            border: 2px solid #b8860b;
+        }
+        .kegel-status {
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 60px;
+            margin: 10px 0;
+            transition: all 0.2s ease;
+        }
+        .kegel-status.contract {
+            background: #b00000;
+            color: white;
+            text-shadow: 0 0 10px black;
+        }
+        .kegel-status.relax {
+            background: #1f6b4a;
+            color: white;
+        }
+        .kegel-progress {
+            background: #2a2a2a;
+            border-radius: 30px;
+            height: 20px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .kegel-progress-fill {
+            background: linear-gradient(90deg, #b8860b, #daa520);
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .kegel-complete {
+            color: #daa520;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            animation: goldGlow 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -402,10 +448,10 @@
 
 <!-- APP PRINCIPAL -->
 <div id="mainApp" class="app">
-    <h1>CÓMO VAS A VIVIR TU VIDA?</h1>
+    <h1>⚡ MARCE · RENDIMIENTO VITAL</h1>
     <div class="sub">Vuelve con él o sobre él</div>
 
-    <div class="motd-phrase" id="dailyPhrase">"Esta es la pared... atraviésala"</div>
+    <div class="motd-phrase" id="dailyPhrase">"Esta es la pared"</div>
 
     <!-- CARDIO NOCTURNO -->
     <div class="cardio-bar-section">
@@ -439,15 +485,16 @@
         <img id="exerciseImg" class="exercise-img" src="1.png" alt="Ejercicio" onerror="this.style.display='none'">
         
         <div class="action-zone">
+            <!-- Zona para ejercicios de TIEMPO (Cardio, Plancha, Estiramiento) -->
             <div id="timeModeArea">
                 <div class="timer-circle"><div class="timer-num" id="timerDisplay">00:00</div><div style="font-size:0.8rem">TEMPORIZADOR</div></div>
-                <!-- Botones para sumar tiempo (en ejercicios de cardio) -->
                 <div class="secondary-controls" id="timeButtons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
                     <button id="addTimeBtn" style="background:#b8860b; padding:12px 25px; border-radius:60px; border:none; color:black; font-weight:bold;">+5 SEG</button>
                     <button id="resetTimeBtn" style="background:#2a2a2a; padding:12px 25px; border-radius:60px; border:none; color:white;">⟳ RESET</button>
                 </div>
             </div>
             
+            <!-- Zona para ejercicios de REPETICIONES (Sentadillas, Puente, etc.) -->
             <div id="repsModeArea" style="display:none">
                 <div class="giant-plus-btn" id="giantPlusBtn"><span>+1</span></div>
                 <div class="secondary-controls">
@@ -456,6 +503,20 @@
                 </div>
                 <div id="repCounter" style="font-size: 3rem; font-weight: bold;">0</div>
                 <div style="font-size: 1.2rem;">Objetivo: <strong id="targetRepsCount">12</strong></div>
+            </div>
+
+            <!-- Zona especial para KEGELS (guía visual) -->
+            <div id="kegelModeArea" style="display:none">
+                <div class="kegel-guide">
+                    <div class="kegel-status" id="kegelStatusText">PREPARAR</div>
+                    <div class="kegel-progress">
+                        <div class="kegel-progress-fill" id="kegelProgressFill"></div>
+                    </div>
+                    <div id="kegelMessage" style="font-size: 0.9rem;">⚔️ Sigue las instrucciones</div>
+                </div>
+                <div class="secondary-controls" style="margin-top: 10px;">
+                    <div class="small-btn" id="resetKegelBtn">⟳ REINICIAR</div>
+                </div>
             </div>
             
             <div id="hint" style="background:#1a1a1a; padding:12px; border-radius:40px; margin:15px 0; font-size:1rem;">⚔️ PREPÁRATE</div>
@@ -478,7 +539,7 @@
 </div>
 
 <script>
-    // ==================== FUEGO DINÁMICO (CANVAS) ====================
+    // ==================== FUEGO DINÁMICO ====================
     const canvas = document.getElementById('fireCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -532,70 +593,44 @@
     initParticles(80);
     animateFire();
     
-    // ==================== FRASES ESPARTANAS (30+ FRASES FUERTES) ====================
-const frasesEspartanas = [
-    // Frases clásicas
-    "Vuelve con él o sobre él.",
-    "Esta es la pared. Atravíésala.",
-    "Mañana es tarde. Hoy es ahora.",
-    "El descanso es para los caídos. Levántate.",
-    "Suda, sangra, respeta.",
-    "La libertad tiene un precio. Págalo hoy.",
-    "Que tu miedo sea tan grande como tu honor.",
+    // ==================== FRASES ESPARTANAS (ALEATORIAS) ====================
+    const frasesEspartanas = [
+        "Vuelve con él o sobre él.", "Esta es la pared. Atravíésala.", "Mañana es tarde. Hoy es ahora.",
+        "El descanso es para los caídos. Levántate.", "Suda, sangra, respeta.",
+        "La libertad tiene un precio. Págalo hoy.", "Que tu miedo sea tan grande como tu honor.",
+        "Un espartano nunca se rinde. Nunca.", "El dolor es temporal. La gloria es para siempre.",
+        "Tus excusas son las mentiras que te cuentas a ti mismo.",
+        "No pidas un camino fácil. Pide piernas fuertes.", "La disciplina pesa más que el arrepentimiento.",
+        "Tus límites son solo una ilusión que tú creaste.", "Cada repetición te acerca a la inmortalidad.",
+        "El miedo es el primer enemigo. Mátalo.", "La constancia vence al talento cuando el talento no trabaja.",
+        "No te detengas cuando estés cansado. Detente cuando hayas terminado.",
+        "El cuerpo logra lo que la mente cree.", "La gloria no se regala. Se conquista.",
+        "Un guerrero no busca pelea, pero nunca huye de ella.", "Hoy puede ser tu último día. Haz que cuente.",
+        "La muerte le teme a un hombre que no tiene nada que perder.",
+        "El infierno no es un lugar. Es un estado mental. Supéralo.",
+        "Si no estás dispuesto a sangrar, no mereces la victoria.",
+        "El enemigo más peligroso está entre tus orejas. Domínalo.",
+        "La debilidad es una elección. La fuerza también.", "No huyas de tu sombra. Conviértete en ella.",
+        "El hierro se forja con fuego. Tú te forjas con dolor.", "La vida te va a golpear. Golpea más fuerte.",
+        "Eres el resultado de tus decisiones, no de tus circunstancias.",
+        "El momento débil es cuando más fuerte debes estar.", "Un día o día uno. Tú decides.",
+        "La única mala sesión es la que no hiciste.", "El cuerpo es débil por naturaleza. La voluntad lo endurece.",
+        "No esperes el momento perfecto. Haz que el momento sea perfecto.",
+        "El sudor de hoy es la victoria de mañana.", "Si puedes soñarlo, puedes lograrlo. Si puedes lograrlo, repítelo.",
+        "El éxito no es tuyo. Te lo prestan mientras trabajas.",
+        "El héroe y el cobarde sienten el mismo miedo. El héroe actúa."
+    ];
     
-    // Frases nuevas - FUERTES
-    "Un espartano nunca se rinde. Nunca.",
-    "El dolor es temporal. La gloria es para siempre.",
-    "Tus excusas son las mentiras que te cuentas a ti mismo.",
-    "No pidas un camino fácil. Pide piernas fuertes.",
-    "La disciplina pesa más que el arrepentimiento.",
-    "Tus límites son solo una ilusión que tú creaste.",
-    "Cada repetición te acerca a la inmortalidad.",
-    "El miedo es el primer enemigo. Mátalo.",
-    "La constancia vence al talento cuando el talento no trabaja.",
-    "No te detengas cuando estés cansado. Detente cuando hayas terminado.",
-    "El cuerpo logra lo que la mente cree.",
-    "La gloria no se regala. Se conquista.",
-    "Un guerrero no busca pelea, pero nunca huye de ella.",
+    let ultimaFraseIndex = -1;
     
-    // Frases TEMERARIAS
-    "Hoy puede ser tu último día. Haz que cuente.",
-    "La muerte le teme a un hombre que no tiene nada que perder.",
-    "El infierno no es un lugar. Es un estado mental. Supéralo.",
-    "Si no estás dispuesto a sangrar, no mereces la victoria.",
-    "El enemigo más peligroso está entre tus orejas. Domínalo.",
-    "La debilidad es una elección. La fuerza también.",
-    "No huyas de tu sombra. Conviértete en ella.",
-    "El hierro se forja con fuego. Tú te forjas con dolor.",
-    "La vida te va a golpear. Golpea más fuerte.",
-    
-    // Frases MOTIVADORAS POWER
-    "Eres el resultado de tus decisiones, no de tus circunstancias.",
-    "El momento débil es cuando más fuerte debes estar.",
-    "Un día o día uno. Tú decides.",
-    "La única mala sesión es la que no hiciste.",
-    "El cuerpo es débil por naturaleza. La voluntad lo endurece.",
-    "No esperes el momento perfecto. Haz que el momento sea perfecto.",
-    "El sudor de hoy es la victoria de mañana.",
-    "Si puedes soñarlo, puedes lograrlo. Si puedes lograrlo, repítelo.",
-    "El éxito no es tuyo. Te lo prestan mientras trabajas.",
-    "El héroe y el cobarde sienten el mismo miedo. El héroe actúa."
-];
-
-// Variable para controlar que no se repita la misma frase dos veces seguidas
-let ultimaFraseIndex = -1;
-
-function setDailyPhrase() {
-    let newIndex;
-    // Evita repetir la misma frase dos días seguidos (si hay más de 1 frase)
-    do {
-        newIndex = Math.floor(Math.random() * frasesEspartanas.length);
-    } while (newIndex === ultimaFraseIndex && frasesEspartanas.length > 1);
-    
-    ultimaFraseIndex = newIndex;
-    const fraseElegida = frasesEspantanas[newIndex];
-    dom.dailyPhrase.innerText = `"${fraseElegida}"`;
-}
+    function setDailyPhrase() {
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * frasesEspartanas.length);
+        } while (newIndex === ultimaFraseIndex && frasesEspartanas.length > 1);
+        ultimaFraseIndex = newIndex;
+        document.getElementById("dailyPhrase").innerText = `"${frasesEspartanas[newIndex]}"`;
+    }
     
     // ==================== CONFIGURACIÓN ====================
     const OBJETIVO_SEMANAL = 90;
@@ -629,10 +664,11 @@ function setDailyPhrase() {
     // Estado
     let cardioSemanal = 0, bonusCardioUsado = false;
     let ejerciciosHoy = [], completadosHoy = [], currentEjercicioIdx = 0;
-    let timer=null, activo=false, tiempoActual=0, objetivo=0, modoTime=true, repActual=0;
-    let gamificacion = { energia:0, fuerza:0, control:0 };
+    let timer = null, activo = false, tiempoActual = 0, objetivo = 0, modoTime = true, repActual = 0;
+    let kegelInterval = null, kegelSegundosRestantes = 0, kegelTotalSegundos = 0;
+    let gamificacion = { energia: 0, fuerza: 0, control: 0 };
     let historial = [];
-    let rachaActual=0;
+    let rachaActual = 0;
     
     // DOM
     const dom = {
@@ -647,20 +683,18 @@ function setDailyPhrase() {
         resetRepsBtn: document.getElementById("resetRepsBtn"), dayBadge: document.getElementById("dayBadge"),
         streakDisplay: document.getElementById("streakDisplay"), pressureStatus: document.getElementById("pressureStatus"),
         circulationStatus: document.getElementById("circulationStatus"), energyStatus: document.getElementById("energyStatus"),
-        cardioBarFill: document.getElementById("cardioBarFill"), dailyPhrase: document.getElementById("dailyPhrase"),
-        giantPlusBtn: document.getElementById("giantPlusBtn"), exerciseImg: document.getElementById("exerciseImg"),
-        addTimeBtn: document.getElementById("addTimeBtn"), resetTimeBtn: document.getElementById("resetTimeBtn"),
-        timeButtons: document.getElementById("timeButtons")
+        cardioBarFill: document.getElementById("cardioBarFill"), giantPlusBtn: document.getElementById("giantPlusBtn"),
+        exerciseImg: document.getElementById("exerciseImg"), addTimeBtn: document.getElementById("addTimeBtn"),
+        resetTimeBtn: document.getElementById("resetTimeBtn"), timeButtons: document.getElementById("timeButtons"),
+        kegelModeArea: document.getElementById("kegelModeArea"), kegelStatusText: document.getElementById("kegelStatusText"),
+        kegelProgressFill: document.getElementById("kegelProgressFill"), kegelMessage: document.getElementById("kegelMessage"),
+        resetKegelBtn: document.getElementById("resetKegelBtn")
     };
     
     function playBeep(){ try{ const audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.1; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); }catch(e){} }
     function vibrateShort(){ if(navigator.vibrate) navigator.vibrate(20); }
     
-    function setDailyPhrase() {
-        const dia = new Date().getDay();
-        dom.dailyPhrase.innerText = `"${frasesEspartanas[dia] || 'Hoy luchamos, mañana descansamos'}"`;
-    }
-    
+    // Cardio
     function actualizarBarraCardio(){
         const porcentaje = Math.min(100, (cardioSemanal / OBJETIVO_SEMANAL) * 100);
         dom.cardioBarFill.style.width = `${porcentaje}%`;
@@ -671,15 +705,15 @@ function setDailyPhrase() {
             gamificacion.energia += 1; gamificacion.control += 1;
             bonusCardioUsado = true;
             actualizarEstadoVital();
-            dom.hint.innerText = "🏆 BONUS ESPARTANO: +1 Energía +1 Control";
+            dom.hint.innerText = "🏆 BONUS: +1 Energía +1 Control";
         }
     }
     
     function agregarMinutosCardio(minutos){
         if(minutos < MIN_POR_SESION) return alert(`Mínimo ${MIN_POR_SESION} min`);
-        if(minutos > MAX_POR_SESION) return alert(`Máximo ${MAX_POR_SESION} min por sesión`);
+        if(minutos > MAX_POR_SESION) return alert(`Máximo ${MAX_POR_SESION} min`);
         cardioSemanal += minutos;
-        localStorage.setItem("crabacode_cardio_semanal", cardioSemanal);
+        localStorage.setItem("marce_cardio_semanal", cardioSemanal);
         actualizarBarraCardio();
         playBeep(); vibrateShort();
         dom.hint.innerHTML = `⚔️ +${minutos} min. Total: ${cardioSemanal}/${OBJETIVO_SEMANAL}`;
@@ -689,12 +723,13 @@ function setDailyPhrase() {
         if(confirm("¿Reiniciar barra de cardio semanal?")){
             cardioSemanal = 0;
             bonusCardioUsado = false;
-            localStorage.setItem("crabacode_cardio_semanal", "0");
+            localStorage.setItem("marce_cardio_semanal", "0");
             actualizarBarraCardio();
-            dom.hint.innerHTML = "Barra de cardio reiniciada. ¡A llenarla de nuevo!";
+            dom.hint.innerHTML = "Barra reiniciada. ¡A llenarla!";
         }
     }
     
+    // Rutina diaria
     function cargarRutinaDelDia(){
         const dia = new Date().getDay();
         const tipo = tiposDia[dia];
@@ -705,8 +740,53 @@ function setDailyPhrase() {
         return ejerciciosHoy;
     }
     
+    function detenerKegels(){
+        if(kegelInterval) { clearInterval(kegelInterval); kegelInterval = null; }
+    }
+    
+    function iniciarKegels(duracionSegundos){
+        detenerKegels();
+        kegelTotalSegundos = duracionSegundos;
+        kegelSegundosRestantes = duracionSegundos;
+        let cicloActual = 0;
+        const ciclos = Math.floor(duracionSegundos / 10);
+        
+        function actualizarUIKegel() {
+            const progreso = ((kegelTotalSegundos - kegelSegundosRestantes) / kegelTotalSegundos) * 100;
+            dom.kegelProgressFill.style.width = `${progreso}%`;
+            if(kegelSegundosRestantes <= 0){
+                dom.kegelStatusText.innerText = "✅ COMPLETADO";
+                dom.kegelStatusText.className = "kegel-status";
+                dom.kegelMessage.innerText = "🎯 ¡Objetivo cumplido! Presiona Completado";
+                detenerKegels();
+                return;
+            }
+            const fase = Math.floor((kegelTotalSegundos - kegelSegundosRestantes) / 5) % 2;
+            if(fase === 0){
+                dom.kegelStatusText.innerText = "🔴 ¡CONTRAE! (5 seg)";
+                dom.kegelStatusText.className = "kegel-status contract";
+            } else {
+                dom.kegelStatusText.innerText = "🔵 RELAJA (5 seg)";
+                dom.kegelStatusText.className = "kegel-status relax";
+            }
+            dom.kegelMessage.innerText = `⚔️ Ciclo ${Math.floor((kegelTotalSegundos - kegelSegundosRestantes) / 5) + 1} de ${ciclos * 2}`;
+        }
+        
+        actualizarUIKegel();
+        kegelInterval = setInterval(() => {
+            if(kegelSegundosRestantes > 0){
+                kegelSegundosRestantes--;
+                actualizarUIKegel();
+                vibrateShort();
+            } else {
+                detenerKegels();
+            }
+        }, 1000);
+    }
+    
     function cargarEjercicioActual(){
         if(timer) clearInterval(timer);
+        detenerKegels();
         const ex = ejerciciosHoy[currentEjercicioIdx];
         if(!ex) return;
         dom.exTitle.innerText = ex.nombre;
@@ -714,17 +794,26 @@ function setDailyPhrase() {
         dom.exerciseImg.src = ex.img;
         dom.exerciseImg.style.display = "block";
         modoTime = ex.esTiempo;
-        if(modoTime){
+        
+        // Ocultar todas las zonas primero
+        dom.timeModeArea.style.display = "none";
+        dom.repsModeArea.style.display = "none";
+        dom.kegelModeArea.style.display = "none";
+        if(dom.timeButtons) dom.timeButtons.style.display = "none";
+        
+        if(ex.esKegel){
+            dom.kegelModeArea.style.display = "block";
+            dom.hint.innerText = "🫀 KEGELS: Sigue la guía visual";
+            objetivo = ex.defaultSeg;
+            // Preparar kegels pero no iniciar hasta que den START
+        } else if(modoTime){
             dom.timeModeArea.style.display = "block";
-            dom.repsModeArea.style.display = "none";
+            if(dom.timeButtons) dom.timeButtons.style.display = "flex";
             objetivo = ex.defaultSeg;
             tiempoActual = 0; dom.timerDisplay.innerText = "00:00";
             dom.hint.innerText = `⏱️ Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
-            if(dom.timeButtons) dom.timeButtons.style.display = "flex";
         } else {
-            dom.timeModeArea.style.display = "block";
             dom.repsModeArea.style.display = "block";
-            if(dom.timeButtons) dom.timeButtons.style.display = "none";
             objetivo = ex.defaultRep;
             dom.targetRepsCount.innerText = objetivo;
             repActual = 0; dom.repCounter.innerText = "0";
@@ -737,7 +826,14 @@ function setDailyPhrase() {
     
     function iniciarModo(){
         if(completadosHoy[currentEjercicioIdx]) return;
-        if(modoTime){
+        const ex = ejerciciosHoy[currentEjercicioIdx];
+        if(ex.esKegel){
+            if(activo) return;
+            activo = true;
+            dom.startBtn.innerText = "⏸ PAUSA (Kegels activos)";
+            iniciarKegels(objetivo);
+            dom.hint.innerText = "🫀 Kegels en progreso. Sigue la guía.";
+        } else if(modoTime){
             if(activo){ if(timer) clearInterval(timer); activo=false; dom.startBtn.innerText="▶ INICIAR"; }
             else {
                 activo=true; dom.startBtn.innerText="⏸ PAUSA";
@@ -750,12 +846,14 @@ function setDailyPhrase() {
                     else dom.hint.innerHTML = `⚔️ ${m}:${s.toString().padStart(2,'0')}`;
                 },1000);
             }
+        } else {
+            dom.hint.innerText = "Usa el botón gigante +1 para sumar reps";
         }
     }
     
     function addTimeToTimer(seconds){
         if(completadosHoy[currentEjercicioIdx]) return;
-        if(modoTime && ejerciciosHoy[currentEjercicioIdx].editable){
+        if(modoTime && ejerciciosHoy[currentEjercicioIdx].editable && !ejerciciosHoy[currentEjercicioIdx].esKegel){
             tiempoActual = Math.min(tiempoActual + seconds, objetivo);
             let m=Math.floor(tiempoActual/60), s=tiempoActual%60;
             dom.timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
@@ -786,18 +884,26 @@ function setDailyPhrase() {
         dom.pressureStatus.innerText = gamificacion.control>=5 ? "📉 EXCELENTE" : (gamificacion.control>=2 ? "⚖️ ESTABLE" : "⚠️ MEJORAR");
         dom.circulationStatus.innerText = gamificacion.energia>=4 ? "🌊 MUY BUENA" : (gamificacion.energia>=2 ? "🌊 BUENA" : "🌊 REGULAR");
         dom.energyStatus.innerText = gamificacion.energia+gamificacion.fuerza>=6 ? "⚡ ALTA" : (gamificacion.energia+gamificacion.fuerza>=3 ? "✨ MEDIA" : "😴 BAJA");
-        localStorage.setItem("crabacode_gamificacion", JSON.stringify(gamificacion));
+        localStorage.setItem("marce_gamificacion", JSON.stringify(gamificacion));
     }
     
     function completarYAvanzar(){
         if(completadosHoy[currentEjercicioIdx]){ avanzarSiguiente(); return; }
         const ex = ejerciciosHoy[currentEjercicioIdx];
-        let alcanzado = modoTime ? (tiempoActual>=objetivo) : (repActual>=objetivo);
+        let alcanzado = false;
+        if(ex.esKegel){
+            alcanzado = (kegelSegundosRestantes <= 0);
+        } else if(modoTime){
+            alcanzado = (tiempoActual >= objetivo);
+        } else {
+            alcanzado = (repActual >= objetivo);
+        }
         if(!alcanzado && !confirm(`¿Completar igual?`)) return;
         if(alcanzado){ vibrateShort(); playBeep(); }
         sumarGamificacion(ex);
         completadosHoy[currentEjercicioIdx] = true;
         if(timer) clearInterval(timer);
+        detenerKegels();
         actualizarChecklist();
         if(completadosHoy.every(v=>v)) finalizarDia();
         else avanzarSiguiente();
@@ -807,7 +913,7 @@ function setDailyPhrase() {
         const hoy = new Date().toISOString().split('T')[0];
         if(!historial.some(h=>h.fecha===hoy)){
             historial.push({ fecha:hoy, total:completadosHoy.filter(v=>v).length });
-            localStorage.setItem("crabacode_historial_final", JSON.stringify(historial));
+            localStorage.setItem("marce_historial_final", JSON.stringify(historial));
         }
         dom.hint.innerText = "🏆 ¡DÍA COMPLETADO, GUERRERO!";
         dom.completeBtn.innerText = "🏆 VICTORIA";
@@ -845,27 +951,42 @@ function setDailyPhrase() {
     
     function reiniciarDia(){ if(confirm("¿Reiniciar el día?")){ cargarRutinaDelDia(); currentEjercicioIdx=0; completadosHoy.fill(false); actualizarChecklist(); cargarEjercicioActual(); } }
     
+    function resetKegel(){
+        if(completadosHoy[currentEjercicioIdx]) return;
+        if(ejerciciosHoy[currentEjercicioIdx] && ejerciciosHoy[currentEjercicioIdx].esKegel){
+            detenerKegels();
+            kegelSegundosRestantes = 0;
+            dom.kegelProgressFill.style.width = "0%";
+            dom.kegelStatusText.innerText = "REINICIADO";
+            dom.kegelMessage.innerText = "Toca INICIAR para empezar";
+            activo = false;
+            dom.startBtn.innerText = "▶ INICIAR";
+            dom.hint.innerText = "Kegels reiniciados. Presiona INICIAR";
+        }
+    }
+    
     // Eventos
     dom.startBtn.onclick = iniciarModo;
-    dom.resetTimerBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Reiniciado"; } };
+    dom.resetTimerBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime && !ejerciciosHoy[currentEjercicioIdx]?.esKegel){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Reiniciado"; } };
     dom.completeBtn.onclick = completarYAvanzar;
     dom.resetDayBtn.onclick = reiniciarDia;
     dom.minusRepBtn.onclick = () => actualizarContador(-1);
     dom.resetRepsBtn.onclick = () => { repActual=0; dom.repCounter.innerText="0"; dom.hint.innerText="Conteo reiniciado"; };
     if(dom.giantPlusBtn) dom.giantPlusBtn.onclick = () => actualizarContador(1);
     if(dom.addTimeBtn) dom.addTimeBtn.onclick = () => addTimeToTimer(5);
-    if(dom.resetTimeBtn) dom.resetTimeBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Tiempo reiniciado"; } };
+    if(dom.resetTimeBtn) dom.resetTimeBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime && !ejerciciosHoy[currentEjercicioIdx]?.esKegel){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Tiempo reiniciado"; } };
+    if(dom.resetKegelBtn) dom.resetKegelBtn.onclick = resetKegel;
     document.getElementById("add5minBtn").onclick = () => agregarMinutosCardio(5);
     document.getElementById("add10minBtn").onclick = () => agregarMinutosCardio(10);
     document.getElementById("add15minBtn").onclick = () => agregarMinutosCardio(15);
     document.getElementById("resetCardioBtn").onclick = resetCardioSemanal;
     
     // Cargar datos
-    const savedCardio = localStorage.getItem("crabacode_cardio_semanal");
+    const savedCardio = localStorage.getItem("marce_cardio_semanal");
     if(savedCardio) cardioSemanal = parseInt(savedCardio);
-    const savedGami = localStorage.getItem("crabacode_gamificacion");
+    const savedGami = localStorage.getItem("marce_gamificacion");
     if(savedGami) gamificacion = JSON.parse(savedGami);
-    const savedHist = localStorage.getItem("crabacode_historial_final");
+    const savedHist = localStorage.getItem("marce_historial_final");
     if(savedHist) historial = JSON.parse(savedHist);
     
     setDailyPhrase();
