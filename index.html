@@ -488,16 +488,32 @@
             color: #daa520;
             display: block;
         }
+        .chart-container {
+            position: relative;
+            margin: 15px 0;
+            cursor: pointer;
+        }
         canvas#historyChart {
             background: #1a1a1a;
             border-radius: 20px;
-            margin: 15px 0;
             width: 100%;
-            height: 200px;
+            height: 220px;
+        }
+        .chart-tooltip {
+            position: absolute;
+            background: #daa520;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1600;
+            white-space: nowrap;
         }
         .history-list {
             margin-top: 15px;
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
         }
         .history-item {
@@ -535,6 +551,16 @@
         .delete-history-btn {
             background: #8b0000;
             margin-top: 10px;
+        }
+        .day-detail {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .day-detail h4 {
+            color: #daa520;
+            margin-bottom: 10px;
         }
         .war-plan-list {
             margin-top: 15px;
@@ -946,15 +972,68 @@
         document.getElementById('closeVictoryBtn').onclick = () => div.remove();
     }
     
+    // NUEVA FUNCIÓN: Mostrar detalle del día al hacer clic en una barra
+    function mostrarDetalleDia(fecha, completados, total) {
+        let registroCompleto = historial.find(h => h.fecha === fecha);
+        let ejerciciosDetalle = registroCompleto ? registroCompleto.ejerciciosDetalle : null;
+        
+        let modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>📅 ${fecha}</h3>
+                <div class="modal-stats">
+                    <div class="modal-stat"><span>Progreso</span><strong>${Math.round((completados/total)*100)}%</strong></div>
+                    <div class="modal-stat"><span>Completados</span><strong>${completados}/${total}</strong></div>
+                </div>
+                <div class="day-detail">
+                    <h4>⚔️ EJERCICIOS REALIZADOS</h4>
+                    <div id="dayExercisesList" style="margin-top: 10px;"></div>
+                </div>
+                <button class="close-modal" id="closeDayDetail">CERRAR</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Mostrar lista de ejercicios (simulada con los que debería tener ese día)
+        let diaSemana = new Date(fecha).getDay();
+        let tipo = tiposDia[diaSemana];
+        let ejerciciosDelDia = tipo ? tipo.ejercicios : [];
+        let ejerciciosNombres = ejerciciosDelDia.map(key => {
+            let ex = ejerciciosDB[key];
+            return ex ? ex.nombre : key;
+        });
+        
+        let listHtml = `<div style="background:#1a1a1a; border-radius:20px; padding:10px;">`;
+        ejerciciosNombres.forEach((nom, i) => {
+            let hecho = i < completados ? "✅" : "⭕";
+            listHtml += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #333;"><span>${hecho}</span><span>${nom}</span></div>`;
+        });
+        listHtml += `</div>`;
+        document.getElementById('dayExercisesList').innerHTML = listHtml;
+        
+        document.getElementById('closeDayDetail').onclick = () => modal.remove();
+    }
+    
     function mostrarHistorial() {
-        let ultimos7 = [];
+        // Preparar datos de los últimos 14 días para mejor visualización
+        let ultimosDias = [];
         let hoy = new Date();
-        for (let i = 6; i >= 0; i--) {
+        for (let i = 13; i >= 0; i--) {
             let fecha = new Date(hoy);
             fecha.setDate(hoy.getDate() - i);
             let fechaStr = fecha.toISOString().split('T')[0];
             let registro = historial.find(h => h.fecha === fechaStr);
-            ultimos7.push({ fecha: fechaStr, completados: registro ? registro.total : 0, total: ejerciciosHoy.length || 6 });
+            let totalEjerciciosDia = 6; // valor por defecto, se ajusta según día
+            let diaSemana = fecha.getDay();
+            let tipo = tiposDia[diaSemana];
+            if(tipo) totalEjerciciosDia = tipo.ejercicios.length;
+            ultimosDias.push({
+                fecha: fechaStr,
+                completados: registro ? registro.total : 0,
+                total: totalEjerciciosDia,
+                porcentaje: registro ? Math.round((registro.total / totalEjerciciosDia) * 100) : 0
+            });
         }
         
         let modal = document.createElement('div');
@@ -968,7 +1047,9 @@
                     <div class="modal-stat"><span>Mejor racha</span><strong>${Math.max(...historial.map(h => h.total), 0)}</strong></div>
                     <div class="modal-stat"><span>Ejercicios hechos</span><strong>${historial.reduce((a, b) => a + b.total, 0)}</strong></div>
                 </div>
-                <canvas id="historyChart" width="400" height="200"></canvas>
+                <div class="chart-container" id="chartContainer">
+                    <canvas id="historyChart" width="400" height="220"></canvas>
+                </div>
                 <div class="history-list" id="historyListModal"></div>
                 <button class="close-modal" id="closeModalBtn">CERRAR</button>
                 <button class="close-modal delete-history-btn" id="deleteAllHistoryBtn">🗑️ BORRAR TODO</button>
@@ -976,24 +1057,79 @@
         `;
         document.body.appendChild(modal);
         
+        // Configurar gráfico de barras de porcentaje
         let ctxChart = document.getElementById('historyChart').getContext('2d');
-        let labels = ultimos7.map(d => d.fecha.slice(5));
-        let completadosData = ultimos7.map(d => d.completados);
-        let totalData = ultimos7.map(d => d.total);
-        new Chart(ctxChart, {
+        let labels = ultimosDias.map(d => d.fecha.slice(5));
+        let porcentajes = ultimosDias.map(d => d.porcentaje);
+        
+        // Colores según porcentaje: dorado si es 100%, rojizo si es bajo
+        let backgroundColors = porcentajes.map(p => {
+            if(p === 100) return '#daa520';
+            if(p >= 70) return '#c49a2b';
+            if(p >= 40) return '#9a7020';
+            return '#6b4a15';
+        });
+        
+        let chart = new Chart(ctxChart, {
             type: 'bar',
-            data: { labels, datasets: [{ label: 'Completados', data: completadosData, backgroundColor: '#daa520', borderRadius: 10 }, { label: 'Totales', data: totalData, backgroundColor: '#b8860b', borderRadius: 10 }] },
-            options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, max: Math.max(...totalData, 6), ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } }, plugins: { legend: { labels: { color: 'white' } } } }
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '% Completado',
+                    data: porcentajes,
+                    backgroundColor: backgroundColors,
+                    borderRadius: 10,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100,
+                        ticks: { color: 'white', callback: (val) => val + '%' },
+                        title: { display: true, text: 'Porcentaje completado', color: '#aaa' }
+                    },
+                    x: { ticks: { color: 'white', maxRotation: 45, minRotation: 45 } }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                let idx = context.dataIndex;
+                                let dia = ultimosDias[idx];
+                                return `${dia.porcentaje}% (${dia.completados}/${dia.total} ejercicios)`;
+                            }
+                        },
+                        backgroundColor: '#daa520',
+                        titleColor: 'black',
+                        bodyColor: 'black',
+                        titleFont: { weight: 'bold' }
+                    },
+                    legend: { labels: { color: 'white' } }
+                },
+                onClick: (event, activeElements) => {
+                    if(activeElements.length > 0) {
+                        let idx = activeElements[0].dataIndex;
+                        let dia = ultimosDias[idx];
+                        mostrarDetalleDia(dia.fecha, dia.completados, dia.total);
+                    }
+                }
+            }
         });
         
         // Lista con botones para borrar cada día individualmente
-        let listHtml = "";
-        // Mostrar todos los días del historial (no solo los últimos 7)
         const todosLosDias = [...historial].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        let listHtml = "";
         todosLosDias.forEach(d => {
+            let diaSemana = new Date(d.fecha).getDay();
+            let totalEjDia = tiposDia[diaSemana]?.ejercicios.length || 6;
+            let porcentaje = Math.round((d.total / totalEjDia) * 100);
             listHtml += `<div class="history-item" data-fecha="${d.fecha}">
                             <span>📆 ${d.fecha}</span>
-                            <span>${d.total}/${d.totalEjercicios || ejerciciosHoy.length} ejercicios</span>
+                            <span>${d.total}/${totalEjDia} (${porcentaje}%)</span>
                             <button class="delete-day-btn" data-fecha="${d.fecha}">🗑️</button>
                          </div>`;
         });
@@ -1091,7 +1227,6 @@
         dom.startBtn.disabled = true;
         calcularRachas();
         
-        // Recompensas por racha
         if(rachaActual >= 3 && rachaActual < 6 && !localStorage.getItem("recompensa_racha_3")) {
             mostrarRecompensa("+1 Energía por racha de 3 días");
             gamificacion.energia++;
