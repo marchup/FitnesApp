@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Marce · Espartano | Rendimiento Vital</title>
+    <title>Marce · Espartano | Fuego y Gloria</title>
     <style>
         * {
             margin: 0;
@@ -13,41 +13,25 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* FONDO ESPARTANO */
         body {
             background: #000000;
             font-family: 'Impact', 'Helvetica Neue', 'Arial Black', system-ui, sans-serif;
             color: #FFFFFF;
             touch-action: pan-y pinch-zoom;
+            min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
-        
-        /* Imagen de fondo estilo espartano */
-        body::before {
-            content: "";
+
+        /* CANVAS DE FONDO CON CHISPAS DE FUEGO */
+        #fireCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('spartan.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.25;
             z-index: -2;
-        }
-        
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            opacity: 0.7;
-            z-index: -1;
+            pointer-events: none;
         }
 
         /* SPLASH SCREEN */
@@ -69,7 +53,7 @@
         .splash img {
             max-width: 70%;
             max-height: 50%;
-            filter: drop-shadow(0 0 20px rgba(180, 0, 0, 0.8));
+            filter: drop-shadow(0 0 20px rgba(218, 165, 32, 0.8));
             margin-bottom: 30px;
         }
         .splash h2 {
@@ -85,7 +69,7 @@
         }
         .splash button {
             margin-top: 40px;
-            background: #b00000;
+            background: #b8860b;
             border: none;
             padding: 18px 50px;
             border-radius: 60px;
@@ -93,6 +77,7 @@
             font-weight: bold;
             font-size: 1.6rem;
             font-family: inherit;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.5);
         }
 
         /* APP PRINCIPAL */
@@ -102,6 +87,8 @@
             padding: 20px 16px 40px;
             display: none;
             min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
         /* TEXTOS BLANCOS Y GRANDES */
@@ -115,11 +102,11 @@
         }
         .sub {
             text-align: center;
-            color: #CCCCCC;
+            color: #FFFFFF;
             font-size: 1rem;
             font-family: monospace;
             margin-bottom: 20px;
-            border-bottom: 2px solid #b00000;
+            border-bottom: 2px solid #b8860b;
             display: inline-block;
             width: auto;
             margin-left: auto;
@@ -127,13 +114,14 @@
             padding-bottom: 5px;
         }
         
-        /* BARRA CARDIO */
+        /* BARRA CARDIO (BRONCE/DORADO) */
         .cardio-bar-section {
-            background: rgba(10, 5, 5, 0.9);
-            border: 2px solid #b00000;
+            background: rgba(10, 5, 5, 0.85);
+            border: 2px solid #b8860b;
             border-radius: 20px;
             padding: 15px;
             margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
         .cardio-title {
             font-size: 1.3rem;
@@ -145,10 +133,11 @@
             border-radius: 30px;
             height: 40px;
             margin: 12px 0;
-            border: 1px solid #b00000;
+            border: 1px solid #b8860b;
+            overflow: hidden;
         }
         .bar-fill {
-            background: linear-gradient(90deg, #b00000, #8b0000);
+            background: linear-gradient(90deg, #b8860b, #daa520, #ffd700);
             width: 0%;
             height: 100%;
             border-radius: 30px;
@@ -158,7 +147,15 @@
             padding-right: 15px;
             font-weight: bold;
             font-size: 1.2rem;
-            color: white;
+            color: black;
+            transition: width 0.5s ease;
+        }
+        @keyframes goldGlow {
+            0% { text-shadow: 0 0 5px #ffd700; }
+            100% { text-shadow: 0 0 20px #ffd700; }
+        }
+        .bar-fill.completed {
+            animation: goldGlow 0.5s ease-in-out 3;
         }
         .cardio-actions {
             display: flex;
@@ -168,7 +165,7 @@
         }
         .cardio-btn {
             background: #2a2a2a;
-            border: 1px solid #b00000;
+            border: 1px solid #b8860b;
             padding: 14px 0;
             border-radius: 60px;
             font-size: 1.3rem;
@@ -177,15 +174,26 @@
             text-align: center;
             color: white;
         }
+        .reset-cardio-btn {
+            background: #3a2a2a;
+            border: 1px solid #8b0000;
+            padding: 14px 0;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            color: #ffaaaa;
+        }
 
         /* Stats Vitales */
         .vital-stats {
-            background: rgba(10, 5, 5, 0.9);
-            border: 1px solid #b00000;
+            background: rgba(10, 5, 5, 0.85);
+            border: 1px solid #b8860b;
             border-radius: 20px;
             padding: 15px;
             margin-bottom: 20px;
             font-size: 1rem;
+            backdrop-filter: blur(5px);
         }
         .vital-row {
             display: flex;
@@ -194,16 +202,17 @@
             color: white;
         }
         .vital-row strong {
-            color: #b00000;
+            color: #daa520;
         }
 
         /* TARJETA DE EJERCICIO */
         .card {
             background: rgba(15, 15, 15, 0.95);
-            border: 2px solid #b00000;
+            border: 2px solid #b8860b;
             border-radius: 40px;
             overflow: hidden;
             margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
         .header-card {
             background: rgba(5, 0, 0, 0.9);
@@ -215,13 +224,14 @@
             color: #FFFFFF;
         }
         .badge {
-            background: #b00000;
+            background: #b8860b;
             padding: 5px 15px;
             border-radius: 40px;
             font-size: 1rem;
             display: inline-block;
             margin-bottom: 8px;
-            color: white;
+            color: black;
+            font-weight: bold;
         }
         .target {
             background: #1a1a1a;
@@ -231,11 +241,12 @@
         }
         .reps {
             font-size: 1.5rem;
-            background: #b00000;
+            background: #b8860b;
             display: inline-block;
             padding: 5px 25px;
             border-radius: 40px;
-            color: white;
+            color: black;
+            font-weight: bold;
         }
         
         /* ZONA DE ACCIÓN */
@@ -244,9 +255,9 @@
             text-align: center;
         }
         
-        /* BOTÓN DE SUMA GIGANTE */
+        /* BOTÓN DE SUMA GIGANTE (para reps) */
         .giant-plus-btn {
-            background: #b00000;
+            background: #b8860b;
             width: 100%;
             max-width: 320px;
             height: 200px;
@@ -256,13 +267,13 @@
             justify-content: center;
             margin: 15px auto;
             cursor: pointer;
-            box-shadow: 0 0 30px rgba(180, 0, 0, 0.6);
+            box-shadow: 0 0 30px rgba(184, 134, 11, 0.6);
             transition: 0.05s linear;
             border: 3px solid #ffffff;
         }
         .giant-plus-btn:active {
             transform: scale(0.96);
-            background: #8b0000;
+            background: #8b6508;
         }
         .giant-plus-btn span {
             font-size: 6rem;
@@ -280,7 +291,7 @@
         }
         .small-btn {
             background: #2a2a2a;
-            border: 1px solid #b00000;
+            border: 1px solid #b8860b;
             width: 80px;
             height: 80px;
             border-radius: 80px;
@@ -290,14 +301,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            color: white;
-        }
-        .reset-counter-btn {
-            background: #1a1a1a;
-            padding: 12px 25px;
-            border-radius: 40px;
-            font-size: 1rem;
-            border: 1px solid #555;
             color: white;
         }
         
@@ -311,7 +314,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border: 3px solid #b00000;
+            border: 3px solid #b8860b;
         }
         .timer-num {
             font-size: 3.5rem;
@@ -321,7 +324,7 @@
         }
         
         .complete-btn {
-            background: #b00000;
+            background: #b8860b;
             width: 90%;
             padding: 18px;
             font-size: 1.4rem;
@@ -329,7 +332,7 @@
             margin: 20px auto;
             border-radius: 60px;
             border: none;
-            color: white;
+            color: black;
         }
         
         .motd-phrase {
@@ -344,11 +347,12 @@
         }
         
         .progress-section {
-            background: rgba(10, 5, 5, 0.9);
+            background: rgba(10, 5, 5, 0.85);
             border-radius: 30px;
             padding: 15px;
             margin-top: 15px;
             color: white;
+            backdrop-filter: blur(5px);
         }
         
         .exercise-img {
@@ -363,9 +367,11 @@
         
         footer {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             margin-top: 20px;
-            color: #888;
+            color: #FFFFFF;
+            font-weight: bold;
+            text-shadow: 0 0 5px black;
         }
         
         button, .giant-plus-btn, .small-btn {
@@ -383,20 +389,23 @@
 </head>
 <body>
 
+<!-- CANVAS PARA CHISPAS DE FUEGO -->
+<canvas id="fireCanvas"></canvas>
+
 <!-- PANTALLA DE BIENVENIDA -->
 <div id="splashScreen" class="splash">
     <img id="splashImage" src="casco.png" alt="Casco" onerror="this.style.display='none'">
-    <h2>MARCE</h2>
+    <h2>CRABACODE</h2>
     <p>"Prepárate para la gloria..."</p>
     <button id="enterBtn">⚔️ INGRESAR ⚔️</button>
 </div>
 
 <!-- APP PRINCIPAL -->
 <div id="mainApp" class="app">
-    <h1>Como vas a vivir tu vida?</h1>
+    <h1>CÓMO VAS A VIVIR TU VIDA?</h1>
     <div class="sub">Vuelve con él o sobre él</div>
 
-    <div class="motd-phrase" id="dailyPhrase">"Esta es la pared"</div>
+    <div class="motd-phrase" id="dailyPhrase">"Esta es la pared... atraviésala"</div>
 
     <!-- CARDIO NOCTURNO -->
     <div class="cardio-bar-section">
@@ -406,6 +415,7 @@
             <button class="cardio-btn" id="add5minBtn">+5 MIN</button>
             <button class="cardio-btn" id="add10minBtn">+10 MIN</button>
             <button class="cardio-btn" id="add15minBtn">+15 MIN</button>
+            <button class="reset-cardio-btn" id="resetCardioBtn">⟳ RESET BARRA</button>
         </div>
     </div>
 
@@ -425,12 +435,17 @@
             <div class="target"><span class="reps" id="targetReps">4 min</span></div>
         </div>
         
-        <!-- IMAGEN DEL EJERCICIO (1.png a 8.png) -->
+        <!-- IMAGEN DEL EJERCICIO -->
         <img id="exerciseImg" class="exercise-img" src="1.png" alt="Ejercicio" onerror="this.style.display='none'">
         
         <div class="action-zone">
             <div id="timeModeArea">
                 <div class="timer-circle"><div class="timer-num" id="timerDisplay">00:00</div><div style="font-size:0.8rem">TEMPORIZADOR</div></div>
+                <!-- Botones para sumar tiempo (en ejercicios de cardio) -->
+                <div class="secondary-controls" id="timeButtons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                    <button id="addTimeBtn" style="background:#b8860b; padding:12px 25px; border-radius:60px; border:none; color:black; font-weight:bold;">+5 SEG</button>
+                    <button id="resetTimeBtn" style="background:#2a2a2a; padding:12px 25px; border-radius:60px; border:none; color:white;">⟳ RESET</button>
+                </div>
             </div>
             
             <div id="repsModeArea" style="display:none">
@@ -446,33 +461,141 @@
             <div id="hint" style="background:#1a1a1a; padding:12px; border-radius:40px; margin:15px 0; font-size:1rem;">⚔️ PREPÁRATE</div>
             
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="startBtn" style="background:#b00000; padding:14px 30px; font-size:1.2rem; border:none; border-radius:60px; color:white;">▶ INICIAR</button>
+                <button id="startBtn" style="background:#b8860b; padding:14px 30px; font-size:1.2rem; border:none; border-radius:60px; color:black; font-weight:bold;">▶ INICIAR</button>
                 <button id="resetTimerBtn" style="background:#2a2a2a; padding:14px 30px; font-size:1.2rem; border:none; border-radius:60px; color:white;">⟳ REINICIAR</button>
             </div>
             
-            <button id="completeBtn" style="background:#b00000; width:90%; padding:18px; font-size:1.3rem; margin:20px auto; border:none; border-radius:60px; color:white;">✅ COMPLETADO · SIGUIENTE</button>
+            <button id="completeBtn" style="background:#b8860b; width:90%; padding:18px; font-size:1.3rem; margin:20px auto; border:none; border-radius:60px; color:black; font-weight:bold;">✅ COMPLETADO · SIGUIENTE</button>
         </div>
     </div>
 
     <div class="progress-section">
         <div style="font-size:1.1rem;">📋 HOY: <span id="completedCount">0</span>/<span id="totalToday">6</span></div>
         <div id="checklist" style="margin-top: 12px;"></div>
-        <button id="resetDayBtn" style="background:#1a1a1a; border:1px solid #b00000; padding:12px; width:100%; margin-top:15px; color:white; border-radius:40px;">🔄 REINICIAR DÍA</button>
+        <button id="resetDayBtn" style="background:#1a1a1a; border:1px solid #b8860b; padding:12px; width:100%; margin-top:15px; color:white; border-radius:40px;">🔄 REINICIAR DÍA</button>
     </div>
     <footer>🛡️ Sin miedo, sin piedad. Cada día cuenta.</footer>
 </div>
 
 <script>
-    // ==================== FRASES ESPARTANAS ====================
-    const frasesEspartanas = {
-        0: "El descanso es para los caídos. Levántate.",
-        1: "Vuelve con él o sobre él.",
-        2: "Suda, sangra, respeta.",
-        3: "Esta es la pared. Atravíésala.",
-        4: "La libertad tiene un precio. Págalo hoy.",
-        5: "Que tu miedo sea tan grande como tu honor.",
-        6: "Mañana es tarde. Hoy es ahora."
-    };
+    // ==================== FUEGO DINÁMICO (CANVAS) ====================
+    const canvas = document.getElementById('fireCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    function createParticle() {
+        return {
+            x: Math.random() * canvas.width,
+            y: canvas.height,
+            radius: Math.random() * 3 + 1,
+            speedY: Math.random() * 2 + 1,
+            alpha: Math.random() * 0.5 + 0.2,
+            color: `rgba(255, ${Math.random() * 100 + 100}, ${Math.random() * 50}, ${Math.random() * 0.6 + 0.2})`
+        };
+    }
+    
+    function initParticles(count) {
+        particles = [];
+        for (let i = 0; i < count; i++) {
+            particles.push(createParticle());
+        }
+    }
+    
+    function animateFire() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            p.y -= p.speedY;
+            if (p.y < 0) {
+                particles[i] = createParticle();
+                particles[i].y = canvas.height;
+                particles[i].x = Math.random() * canvas.width;
+            }
+        }
+        requestAnimationFrame(animateFire);
+    }
+    
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initParticles(80);
+    });
+    resizeCanvas();
+    initParticles(80);
+    animateFire();
+    
+    // ==================== FRASES ESPARTANAS (30+ FRASES FUERTES) ====================
+const frasesEspartanas = [
+    // Frases clásicas
+    "Vuelve con él o sobre él.",
+    "Esta es la pared. Atravíésala.",
+    "Mañana es tarde. Hoy es ahora.",
+    "El descanso es para los caídos. Levántate.",
+    "Suda, sangra, respeta.",
+    "La libertad tiene un precio. Págalo hoy.",
+    "Que tu miedo sea tan grande como tu honor.",
+    
+    // Frases nuevas - FUERTES
+    "Un espartano nunca se rinde. Nunca.",
+    "El dolor es temporal. La gloria es para siempre.",
+    "Tus excusas son las mentiras que te cuentas a ti mismo.",
+    "No pidas un camino fácil. Pide piernas fuertes.",
+    "La disciplina pesa más que el arrepentimiento.",
+    "Tus límites son solo una ilusión que tú creaste.",
+    "Cada repetición te acerca a la inmortalidad.",
+    "El miedo es el primer enemigo. Mátalo.",
+    "La constancia vence al talento cuando el talento no trabaja.",
+    "No te detengas cuando estés cansado. Detente cuando hayas terminado.",
+    "El cuerpo logra lo que la mente cree.",
+    "La gloria no se regala. Se conquista.",
+    "Un guerrero no busca pelea, pero nunca huye de ella.",
+    
+    // Frases TEMERARIAS
+    "Hoy puede ser tu último día. Haz que cuente.",
+    "La muerte le teme a un hombre que no tiene nada que perder.",
+    "El infierno no es un lugar. Es un estado mental. Supéralo.",
+    "Si no estás dispuesto a sangrar, no mereces la victoria.",
+    "El enemigo más peligroso está entre tus orejas. Domínalo.",
+    "La debilidad es una elección. La fuerza también.",
+    "No huyas de tu sombra. Conviértete en ella.",
+    "El hierro se forja con fuego. Tú te forjas con dolor.",
+    "La vida te va a golpear. Golpea más fuerte.",
+    
+    // Frases MOTIVADORAS POWER
+    "Eres el resultado de tus decisiones, no de tus circunstancias.",
+    "El momento débil es cuando más fuerte debes estar.",
+    "Un día o día uno. Tú decides.",
+    "La única mala sesión es la que no hiciste.",
+    "El cuerpo es débil por naturaleza. La voluntad lo endurece.",
+    "No esperes el momento perfecto. Haz que el momento sea perfecto.",
+    "El sudor de hoy es la victoria de mañana.",
+    "Si puedes soñarlo, puedes lograrlo. Si puedes lograrlo, repítelo.",
+    "El éxito no es tuyo. Te lo prestan mientras trabajas.",
+    "El héroe y el cobarde sienten el mismo miedo. El héroe actúa."
+];
+
+// Variable para controlar que no se repita la misma frase dos veces seguidas
+let ultimaFraseIndex = -1;
+
+function setDailyPhrase() {
+    let newIndex;
+    // Evita repetir la misma frase dos días seguidos (si hay más de 1 frase)
+    do {
+        newIndex = Math.floor(Math.random() * frasesEspartanas.length);
+    } while (newIndex === ultimaFraseIndex && frasesEspartanas.length > 1);
+    
+    ultimaFraseIndex = newIndex;
+    const fraseElegida = frasesEspantanas[newIndex];
+    dom.dailyPhrase.innerText = `"${fraseElegida}"`;
+}
     
     // ==================== CONFIGURACIÓN ====================
     const OBJETIVO_SEMANAL = 90;
@@ -491,7 +614,7 @@
     };
     
     const ejerciciosDB = {
-        cardio: { nombre: "⚔️ CARDIO", img: "1.png", defaultSeg: 240, esTiempo: true, texto: "4 MIN", tipoGamif: "energia" },
+        cardio: { nombre: "⚔️ CARDIO", img: "1.png", defaultSeg: 240, esTiempo: true, texto: "4 MIN", tipoGamif: "energia", editable: true },
         sentadillas: { nombre: "🏋️ SENTADILLAS", img: "2.png", defaultRep: 12, esTiempo: false, texto: "12 REPS", tipoGamif: "fuerza" },
         puente: { nombre: "🍑 PUENTE GLÚTEO", img: "3.png", defaultRep: 12, esTiempo: false, texto: "12 REPS", tipoGamif: "fuerza" },
         rotaciones: { nombre: "🔄 ROTACIONES", img: "4.png", defaultRep: 8, esTiempo: false, texto: "8 REPS", tipoGamif: "control" },
@@ -507,7 +630,6 @@
     let cardioSemanal = 0, bonusCardioUsado = false;
     let ejerciciosHoy = [], completadosHoy = [], currentEjercicioIdx = 0;
     let timer=null, activo=false, tiempoActual=0, objetivo=0, modoTime=true, repActual=0;
-    let kegelInterval=null, kegelPhase="relax";
     let gamificacion = { energia:0, fuerza:0, control:0 };
     let historial = [];
     let rachaActual=0;
@@ -526,31 +648,33 @@
         streakDisplay: document.getElementById("streakDisplay"), pressureStatus: document.getElementById("pressureStatus"),
         circulationStatus: document.getElementById("circulationStatus"), energyStatus: document.getElementById("energyStatus"),
         cardioBarFill: document.getElementById("cardioBarFill"), dailyPhrase: document.getElementById("dailyPhrase"),
-        giantPlusBtn: document.getElementById("giantPlusBtn"), exerciseImg: document.getElementById("exerciseImg")
+        giantPlusBtn: document.getElementById("giantPlusBtn"), exerciseImg: document.getElementById("exerciseImg"),
+        addTimeBtn: document.getElementById("addTimeBtn"), resetTimeBtn: document.getElementById("resetTimeBtn"),
+        timeButtons: document.getElementById("timeButtons")
     };
     
-    // Helper
     function playBeep(){ try{ const audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.1; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); }catch(e){} }
     function vibrateShort(){ if(navigator.vibrate) navigator.vibrate(20); }
     
-    // Frase del día
     function setDailyPhrase() {
         const dia = new Date().getDay();
         dom.dailyPhrase.innerText = `"${frasesEspartanas[dia] || 'Hoy luchamos, mañana descansamos'}"`;
     }
     
-    // Cardio
     function actualizarBarraCardio(){
         const porcentaje = Math.min(100, (cardioSemanal / OBJETIVO_SEMANAL) * 100);
         dom.cardioBarFill.style.width = `${porcentaje}%`;
         dom.cardioBarFill.innerText = `${Math.floor(porcentaje)}%`;
         if(cardioSemanal >= OBJETIVO_SEMANAL && !bonusCardioUsado){
+            dom.cardioBarFill.classList.add('completed');
+            setTimeout(() => dom.cardioBarFill.classList.remove('completed'), 1500);
             gamificacion.energia += 1; gamificacion.control += 1;
             bonusCardioUsado = true;
             actualizarEstadoVital();
             dom.hint.innerText = "🏆 BONUS ESPARTANO: +1 Energía +1 Control";
         }
     }
+    
     function agregarMinutosCardio(minutos){
         if(minutos < MIN_POR_SESION) return alert(`Mínimo ${MIN_POR_SESION} min`);
         if(minutos > MAX_POR_SESION) return alert(`Máximo ${MAX_POR_SESION} min por sesión`);
@@ -561,7 +685,16 @@
         dom.hint.innerHTML = `⚔️ +${minutos} min. Total: ${cardioSemanal}/${OBJETIVO_SEMANAL}`;
     }
     
-    // Rutina
+    function resetCardioSemanal(){
+        if(confirm("¿Reiniciar barra de cardio semanal?")){
+            cardioSemanal = 0;
+            bonusCardioUsado = false;
+            localStorage.setItem("crabacode_cardio_semanal", "0");
+            actualizarBarraCardio();
+            dom.hint.innerHTML = "Barra de cardio reiniciada. ¡A llenarla de nuevo!";
+        }
+    }
+    
     function cargarRutinaDelDia(){
         const dia = new Date().getDay();
         const tipo = tiposDia[dia];
@@ -573,7 +706,7 @@
     }
     
     function cargarEjercicioActual(){
-        if(timer) clearInterval(timer); if(kegelInterval) clearInterval(kegelInterval);
+        if(timer) clearInterval(timer);
         const ex = ejerciciosHoy[currentEjercicioIdx];
         if(!ex) return;
         dom.exTitle.innerText = ex.nombre;
@@ -587,13 +720,15 @@
             objetivo = ex.defaultSeg;
             tiempoActual = 0; dom.timerDisplay.innerText = "00:00";
             dom.hint.innerText = `⏱️ Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
+            if(dom.timeButtons) dom.timeButtons.style.display = "flex";
         } else {
-            dom.timeModeArea.style.display = "none";
+            dom.timeModeArea.style.display = "block";
             dom.repsModeArea.style.display = "block";
+            if(dom.timeButtons) dom.timeButtons.style.display = "none";
             objetivo = ex.defaultRep;
             dom.targetRepsCount.innerText = objetivo;
             repActual = 0; dom.repCounter.innerText = "0";
-            dom.hint.innerText = `🎯 OBJETIVO: ${objetivo} repeticiones. Toca el escudo rojo.`;
+            dom.hint.innerText = `🎯 OBJETIVO: ${objetivo} repeticiones. Toca el escudo dorado.`;
         }
         activo = false;
         dom.startBtn.innerText = "▶ INICIAR";
@@ -615,6 +750,17 @@
                     else dom.hint.innerHTML = `⚔️ ${m}:${s.toString().padStart(2,'0')}`;
                 },1000);
             }
+        }
+    }
+    
+    function addTimeToTimer(seconds){
+        if(completadosHoy[currentEjercicioIdx]) return;
+        if(modoTime && ejerciciosHoy[currentEjercicioIdx].editable){
+            tiempoActual = Math.min(tiempoActual + seconds, objetivo);
+            let m=Math.floor(tiempoActual/60), s=tiempoActual%60;
+            dom.timerDisplay.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            vibrateShort();
+            if(tiempoActual >= objetivo) dom.hint.innerHTML = "🎯 ¡OBJETIVO CUMPLIDO!";
         }
     }
     
@@ -707,9 +853,12 @@
     dom.minusRepBtn.onclick = () => actualizarContador(-1);
     dom.resetRepsBtn.onclick = () => { repActual=0; dom.repCounter.innerText="0"; dom.hint.innerText="Conteo reiniciado"; };
     if(dom.giantPlusBtn) dom.giantPlusBtn.onclick = () => actualizarContador(1);
+    if(dom.addTimeBtn) dom.addTimeBtn.onclick = () => addTimeToTimer(5);
+    if(dom.resetTimeBtn) dom.resetTimeBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Tiempo reiniciado"; } };
     document.getElementById("add5minBtn").onclick = () => agregarMinutosCardio(5);
     document.getElementById("add10minBtn").onclick = () => agregarMinutosCardio(10);
     document.getElementById("add15minBtn").onclick = () => agregarMinutosCardio(15);
+    document.getElementById("resetCardioBtn").onclick = resetCardioSemanal;
     
     // Cargar datos
     const savedCardio = localStorage.getItem("crabacode_cardio_semanal");
@@ -719,7 +868,6 @@
     const savedHist = localStorage.getItem("crabacode_historial_final");
     if(savedHist) historial = JSON.parse(savedHist);
     
-    // Inicializar
     setDailyPhrase();
     actualizarBarraCardio();
     cargarRutinaDelDia();
