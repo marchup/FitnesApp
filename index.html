@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Marce Espartano</title>
+    <!-- Librería para el gráfico -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -204,6 +206,21 @@
         .vital-row strong {
             color: #daa520;
         }
+        /* Botón historial nuevo */
+        .history-btn {
+            background: #2a2a2a;
+            border: 1px solid #b8860b;
+            padding: 10px;
+            border-radius: 60px;
+            width: 100%;
+            margin-top: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+        .history-btn:active { transform: scale(0.96); background: #3a3a3a; }
 
         /* TARJETA DE EJERCICIO */
         .card {
@@ -431,6 +448,149 @@
             margin-top: 10px;
             animation: goldGlow 0.5s ease-in-out;
         }
+
+        /* MODAL DEL HISTORIAL */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: #0a0a0a;
+            border: 2px solid #b8860b;
+            border-radius: 40px;
+            padding: 25px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            font-size: 1.8rem;
+            color: #daa520;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .modal-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .modal-stat {
+            background: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 30px;
+            text-align: center;
+            flex: 1;
+        }
+        .modal-stat span {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        .modal-stat strong {
+            font-size: 1.5rem;
+            color: #daa520;
+            display: block;
+        }
+        canvas#historyChart {
+            background: #1a1a1a;
+            border-radius: 20px;
+            margin: 15px 0;
+            width: 100%;
+            height: 200px;
+        }
+        .history-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #1a1a1a;
+            margin: 5px 0;
+            border-radius: 30px;
+        }
+        .close-modal {
+            background: #b8860b;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 60px;
+            color: black;
+            font-weight: bold;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        /* PANTALLA DE VICTORIA */
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .victory-content {
+            text-align: center;
+            animation: victoryPulse 0.8s ease-out;
+        }
+        @keyframes victoryPulse {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .victory-content img {
+            max-width: 200px;
+            filter: drop-shadow(0 0 30px rgba(218, 165, 32, 0.8));
+            margin-bottom: 20px;
+        }
+        .victory-content h2 {
+            font-size: 4rem;
+            color: #daa520;
+            text-shadow: 0 0 20px #b8860b;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+        .victory-content p {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .victory-content button {
+            background: #b8860b;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 60px;
+            color: black;
+            font-weight: bold;
+            font-size: 1.3rem;
+            font-family: inherit;
+        }
     </style>
 </head>
 <body>
@@ -471,6 +631,8 @@
         <div class="vital-row"><span>🔄 Circulación:</span><strong id="circulationStatus">🌊 buena</strong></div>
         <div class="vital-row"><span>⚡ Energía:</span><strong id="energyStatus">✨ activa</strong></div>
         <div class="vital-row"><span>🔥 Racha:</span><strong id="streakDisplay">0</strong> días</div>
+        <!-- NUEVO BOTÓN HISTORIAL -->
+        <button class="history-btn" id="historyBtn">📊 VER HISTORIAL</button>
     </div>
 
     <!-- EJERCICIO ACTUAL -->
@@ -688,11 +850,94 @@
         resetTimeBtn: document.getElementById("resetTimeBtn"), timeButtons: document.getElementById("timeButtons"),
         kegelModeArea: document.getElementById("kegelModeArea"), kegelStatusText: document.getElementById("kegelStatusText"),
         kegelProgressFill: document.getElementById("kegelProgressFill"), kegelMessage: document.getElementById("kegelMessage"),
-        resetKegelBtn: document.getElementById("resetKegelBtn")
+        resetKegelBtn: document.getElementById("resetKegelBtn"), historyBtn: document.getElementById("historyBtn")
     };
     
     function playBeep(){ try{ const audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.1; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); }catch(e){} }
     function vibrateShort(){ if(navigator.vibrate) navigator.vibrate(20); }
+    
+    // ==================== NUEVA FUNCIÓN: MOSTRAR VICTORIA ====================
+    function mostrarVictoria() {
+        let victoryDiv = document.createElement('div');
+        victoryDiv.className = 'victory-overlay';
+        victoryDiv.innerHTML = `
+            <div class="victory-content">
+                <img src="lambda.png" alt="Lambda" onerror="this.style.display='none'">
+                <h2>¡VICTORIA!</h2>
+                <p>Hoy has conquistado tu destino</p>
+                <button id="closeVictoryBtn">⚔️ CONTINUAR ⚔️</button>
+            </div>
+        `;
+        document.body.appendChild(victoryDiv);
+        document.getElementById('closeVictoryBtn').onclick = () => victoryDiv.remove();
+    }
+    
+    // ==================== NUEVA FUNCIÓN: MOSTRAR HISTORIAL CON GRÁFICO ====================
+    function mostrarHistorial() {
+        // Preparar datos de los últimos 7 días
+        let ultimos7 = [];
+        let hoy = new Date();
+        for (let i = 6; i >= 0; i--) {
+            let fecha = new Date(hoy);
+            fecha.setDate(hoy.getDate() - i);
+            let fechaStr = fecha.toISOString().split('T')[0];
+            let registro = historial.find(h => h.fecha === fechaStr);
+            let totalEjerciciosDia = ejerciciosHoy.length || 6;
+            ultimos7.push({
+                fecha: fechaStr,
+                completados: registro ? registro.total : 0,
+                total: totalEjerciciosDia
+            });
+        }
+        
+        let modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>📊 HISTORIAL</h3>
+                <div class="modal-stats">
+                    <div class="modal-stat"><span>Días totales</span><strong>${historial.length}</strong></div>
+                    <div class="modal-stat"><span>Racha actual</span><strong>${rachaActual}</strong></div>
+                    <div class="modal-stat"><span>Mejor racha</span><strong>${Math.max(...historial.map(h => h.total), 0)}</strong></div>
+                    <div class="modal-stat"><span>Ejercicios hechos</span><strong>${historial.reduce((a, b) => a + b.total, 0)}</strong></div>
+                </div>
+                <canvas id="historyChart" width="400" height="200"></canvas>
+                <div class="history-list" id="historyListModal"></div>
+                <button class="close-modal" id="closeModalBtn">CERRAR</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Dibujar gráfico
+        let ctxChart = document.getElementById('historyChart').getContext('2d');
+        let labels = ultimos7.map(d => d.fecha.slice(5));
+        let completadosData = ultimos7.map(d => d.completados);
+        let totalData = ultimos7.map(d => d.total);
+        new Chart(ctxChart, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Completados', data: completadosData, backgroundColor: '#daa520', borderRadius: 10 },
+                    { label: 'Totales', data: totalData, backgroundColor: '#b8860b', borderRadius: 10 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: { beginAtZero: true, max: Math.max(...totalData, 6), ticks: { color: 'white' } },
+                    x: { ticks: { color: 'white' } }
+                },
+                plugins: { legend: { labels: { color: 'white' } } }
+            }
+        });
+        
+        // Lista de días recientes
+        let listHtml = ultimos7.map(d => `<div class="history-item"><span>📆 ${d.fecha}</span><span>${d.completados}/${d.total} ejercicios</span></div>`).join('');
+        document.getElementById('historyListModal').innerHTML = listHtml;
+        document.getElementById('closeModalBtn').onclick = () => modal.remove();
+    }
     
     // Cardio
     function actualizarBarraCardio(){
@@ -919,6 +1164,8 @@
         dom.completeBtn.innerText = "🏆 VICTORIA";
         dom.startBtn.disabled = true;
         calcularRachas();
+        // Mostrar la pantalla de victoria con lambda.png
+        mostrarVictoria();
     }
     
     function avanzarSiguiente(){
@@ -976,6 +1223,7 @@
     if(dom.addTimeBtn) dom.addTimeBtn.onclick = () => addTimeToTimer(5);
     if(dom.resetTimeBtn) dom.resetTimeBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime && !ejerciciosHoy[currentEjercicioIdx]?.esKegel){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Tiempo reiniciado"; } };
     if(dom.resetKegelBtn) dom.resetKegelBtn.onclick = resetKegel;
+    if(dom.historyBtn) dom.historyBtn.onclick = mostrarHistorial;
     document.getElementById("add5minBtn").onclick = () => agregarMinutosCardio(5);
     document.getElementById("add10minBtn").onclick = () => agregarMinutosCardio(10);
     document.getElementById("add15minBtn").onclick = () => agregarMinutosCardio(15);
