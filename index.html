@@ -3,535 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>Crabacode · RUTINA ACTIVA · Mobile UX</title>
+    <title>Crabacode · RENDIMIENTO VITAL</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;user-select:none; -webkit-tap-highlight-color:transparent}
+        *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
         body{background:#0a0f1a;font-family:system-ui,sans-serif;padding:20px 16px 40px;color:#eef2ff;touch-action:pan-y pinch-zoom}
         .app{max-width:550px;margin:0 auto}
-        h1{font-size:1.8rem;background:linear-gradient(135deg,#a3e4c2,#6ea8fe);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
-        .sub{text-align:center;color:#9aaec5;font-size:0.85rem;margin:6px 0 12px}
-        /* Gamificación */
-        .stats-row{background:#0c1422;border-radius:40px;padding:10px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2a3748;font-size:0.8rem;flex-wrap:wrap;gap:10px}
-        .stat-badge{display:flex;gap:12px;flex-wrap:wrap}
-        .stat-item{background:#1a2538;padding:4px 12px;border-radius:40px}
-        .motd{color:#a3e4c2;font-size:0.75rem;background:#1a2c3f;padding:4px 12px;border-radius:40px}
-        .card{background:#111827;border-radius:40px;overflow:hidden;border:1px solid #2a3748;margin-bottom:24px}
-        .header-card{background:#0f172a;padding:18px 20px 12px}
-        .titulo{font-size:1.5rem;font-weight:700;color:#c4f0da;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-        .badge{background:#1f3b4c;padding:4px 12px;border-radius:40px;font-size:0.75rem}
-        .target{background:#1a2538;margin:14px 20px 0;padding:12px 16px;border-radius:32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-        .reps{background:#2c6e4f;padding:4px 16px;border-radius:60px;font-weight:600}
-        .desc{color:#bbd4f0;font-size:0.8rem}
-        .img-area{display:flex;justify-content:center;padding:16px 20px 8px;background:#0a0f18}
-        .img-area img{max-width:100%;max-height:200px;border-radius:20px;background:#1a2538;padding:8px;object-fit:contain}
-        .timer-area{text-align:center;padding:8px 20px 24px}
-        .timer-circle{background:#0f172a;width:160px;height:160px;margin:10px auto;border-radius:999px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #2a4c6e;transition:all 0.2s ease}
-        .kegel-contract .timer-circle{background:#4a1f2f;border-color:#ff6b8a;box-shadow:0 0 12px rgba(255,80,120,0.3)}
-        .kegel-relax .timer-circle{background:#1f3f4a;border-color:#6ea8fe;box-shadow:0 0 8px rgba(110,168,254,0.2)}
-        .timer-num{font-size:2.8rem;font-weight:800;font-family:monospace;color:#b9f3e0}
-        .timer-label{font-size:0.7rem;color:#8db5d6}
-        .progress-badge{background:#1a2c3f;padding:6px 14px;border-radius:40px;display:inline-block;margin:12px 0;font-size:0.8rem}
+        h1{font-size:1.6rem;background:linear-gradient(135deg,#a3e4c2,#f0a3c2);-webkit-background-clip:text;background-clip:text;color:transparent;text-align:center}
+        .sub{text-align:center;color:#9aaec5;font-size:0.75rem;margin:4px 0 12px}
         
-        /* ========== MEJORAS TÁCTILES PARA REPETICIONES ========== */
-        .counter-area{display:flex;align-items:center;justify-content:center;gap:30px;margin:20px 0}
-        .counter-btn{
-            background:#2d3e54;
-            border:none;
-            font-size:2.5rem;
-            width:90px;
-            height:90px;
-            border-radius:70px;
-            color:white;
-            cursor:pointer;
-            font-weight:bold;
-            touch-action:manipulation;
-            box-shadow:0 8px 0 #151f2a;
-            transition:0.05s linear;
-        }
-        .counter-btn:active{transform:translateY(4px);box-shadow:0 4px 0 #151f2a}
-        .counter-value{
-            font-size:3.6rem;
-            font-weight:800;
-            min-width:100px;
-            text-align:center;
-            color:#a3e4c2;
-            background:#0f1825;
-            padding:0 20px;
-            border-radius:60px;
-            line-height:1.3;
-        }
-        .reset-counter{background:#4a2f2f;color:#ffaaaa;padding:8px 18px;border-radius:40px;font-size:0.8rem;border:none;margin-left:10px;touch-action:manipulation}
+        /* Cabecera de estado vital */
+        .vital-stats{background:#0c1422;border-radius:40px;padding:12px 16px;margin-bottom:16px;border:1px solid #2a3748}
+        .vital-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+        .vital-item{background:#1a2538;padding:4px 12px;border-radius:40px;font-size:0.75rem}
+        .vital-highlight{color:#f0a3c2;font-weight:bold}
+        .streak-fire{color:#ffaa44}
         
-        /* Zona táctil dividida (mitad izquierda / derecha) */
-        .reps-touch-zone{
-            position:relative;
-            margin:10px 0 5px;
-            border-radius:80px;
-            background:rgba(30,40,55,0.4);
-            backdrop-filter:blur(2px);
-            padding:8px 0;
-        }
-        .touch-hint{
-            font-size:0.75rem;
-            background:#1a2c3f;
-            display:inline-block;
-            padding:5px 16px;
-            border-radius:60px;
-            margin-bottom:12px;
-            color:#bbd4f0;
-        }
-        .split-zone{
-            display:flex;
-            gap:15px;
-            justify-content:center;
-        }
-        .half-zone-left, .half-zone-right{
-            flex:1;
-            text-align:center;
-            padding:12px 0;
-            border-radius:60px;
-            background:#1a2538;
-            font-weight:600;
-            font-size:0.8rem;
-            touch-action:manipulation;
-            cursor:pointer;
-            transition:0.05s linear;
-            color:#9bb8e0;
-        }
-        .half-zone-left:active, .half-zone-right:active{background:#2e405b;transform:scale(0.97)}
+        /* Bonus card */
+        .bonus-card{background:linear-gradient(135deg,#1f2a3a,#0f172a);border-radius:32px;padding:12px 16px;margin-bottom:16px;border:1px solid #f0a3c260;cursor:pointer;transition:0.1s}
+        .bonus-card:active{transform:scale(0.98)}
+        .bonus-title{font-weight:bold;color:#f0a3c2;display:flex;justify-content:space-between}
+        .bonus-desc{font-size:0.7rem;color:#bbd4f0;margin-top:4px}
         
-        .buttons{display:flex;gap:15px;justify-content:center;margin:16px 0 8px}
-        button{
-            border:none;
-            padding:12px 24px;
-            border-radius:60px;
-            font-weight:600;
-            cursor:pointer;
-            font-family:inherit;
-            touch-action:manipulation;
-            transition:0.05s linear;
-        }
-        button:active{transform:scale(0.96)}
-        .btn-primary{background:#2b6e4f;color:white;box-shadow:0 4px 0 #1b4735}
-        .btn-secondary{background:#2d3e54;color:#eef2ff;box-shadow:0 4px 0 #1a2538}
-        .complete-btn{background:#1f6392;color:white;width:85%;margin:10px auto 20px;padding:15px;display:block;font-size:1.1rem;box-shadow:0 5px 0 #124562}
-        .progress-section{background:#0e1622;border-radius:28px;padding:16px;border:1px solid #232f3f;margin-top:16px}
-        .progress-title{font-weight:600;margin-bottom:12px}
-        .list-item{background:#0f1825;border-radius:60px;padding:12px 16px;display:flex;justify-content:space-between;margin-bottom:8px;border:1px solid #253545;cursor:pointer;touch-action:manipulation}
+        .card{background:#111827;border-radius:40px;overflow:hidden;border:1px solid #2a3748;margin-bottom:20px}
+        .header-card{background:#0f172a;padding:14px 18px 10px}
+        .titulo{font-size:1.3rem;font-weight:700;color:#c4f0da;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+        .badge{background:#1f3b4c;padding:3px 10px;border-radius:40px;font-size:0.7rem}
+        .target{background:#1a2538;margin:10px 16px 0;padding:10px 14px;border-radius:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+        .reps{background:#2c6e4f;padding:3px 14px;border-radius:60px;font-weight:600;font-size:0.8rem}
+        .desc{color:#bbd4f0;font-size:0.75rem}
+        .img-area{display:flex;justify-content:center;padding:12px 16px 6px;background:#0a0f18}
+        .img-area img{max-width:100%;max-height:160px;border-radius:20px;background:#1a2538;padding:6px;object-fit:contain}
+        .timer-area{text-align:center;padding:6px 16px 18px}
+        .timer-circle{background:#0f172a;width:140px;height:140px;margin:8px auto;border-radius:999px;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px solid #2a4c6e;transition:all 0.2s}
+        .kegel-contract .timer-circle{background:#4a1f2f;border-color:#ff6b8a}
+        .kegel-relax .timer-circle{background:#1f3f4a;border-color:#6ea8fe}
+        .timer-num{font-size:2.4rem;font-weight:800;font-family:monospace;color:#b9f3e0}
+        .timer-label{font-size:0.65rem;color:#8db5d6}
+        .progress-badge{background:#1a2c3f;padding:5px 12px;border-radius:40px;display:inline-block;margin:8px 0;font-size:0.75rem}
+        .counter-area{display:flex;align-items:center;justify-content:center;gap:25px;margin:15px 0}
+        .counter-btn{background:#2d3e54;border:none;font-size:2.2rem;width:80px;height:80px;border-radius:60px;color:white;cursor:pointer;font-weight:bold;touch-action:manipulation}
+        .counter-btn:active{transform:scale(0.95)}
+        .counter-value{font-size:3rem;font-weight:800;min-width:80px;text-align:center;color:#a3e4c2}
+        .reps-touch-zone{margin:8px 0;background:rgba(30,40,55,0.4);border-radius:60px;padding:6px 0}
+        .touch-hint{font-size:0.7rem;background:#1a2c3f;display:inline-block;padding:3px 12px;border-radius:60px;margin-bottom:8px}
+        .split-zone{display:flex;gap:12px}
+        .half-zone-left,.half-zone-right{flex:1;text-align:center;padding:10px 0;border-radius:50px;background:#1a2538;font-size:0.75rem;touch-action:manipulation}
+        .half-zone-left:active,.half-zone-right:active{background:#2e405b}
+        .buttons{display:flex;gap:12px;justify-content:center;margin:12px 0 6px}
+        button{padding:10px 20px;border-radius:60px;font-weight:600;touch-action:manipulation}
+        .btn-primary{background:#2b6e4f;color:white}
+        .btn-secondary{background:#2d3e54;color:#eef2ff}
+        .complete-btn{background:#1f6392;color:white;width:85%;margin:8px auto 16px;padding:12px;display:block}
+        .progress-section{background:#0e1622;border-radius:28px;padding:14px;margin-top:14px}
+        .list-item{background:#0f1825;border-radius:60px;padding:8px 14px;display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.8rem}
         .list-item.completed{background:#1a3a2e;text-decoration:line-through;color:#9bc0ad}
-        .reset-btn{background:#0e1622;border:1px solid #3a4c62;padding:12px 18px;border-radius:40px;color:#bbd4f0;margin-top:20px;width:100%}
-        .history-section{background:#0e1622;border-radius:28px;padding:16px;margin-top:16px;border:1px solid #2a3a4a}
-        .history-title{font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between}
-        .history-stats{display:flex;gap:15px;margin-bottom:12px;font-size:0.8rem}
-        .stat-card{background:#1a2538;padding:8px 12px;border-radius:20px;flex:1;text-align:center}
-        .history-list{max-height:150px;overflow-y:auto;font-size:0.75rem}
-        .history-item{background:#0f1825;padding:6px 10px;margin:4px 0;border-radius:20px;display:flex;justify-content:space-between}
-        .clear-history{background:#3a2a2a;border:1px solid #8b5a5a;padding:6px 14px;border-radius:20px;color:#ffaaaa;font-size:0.7rem;touch-action:manipulation}
-        .kegel-state-indicator{font-weight:bold;display:inline-block;margin-left:8px}
-        @keyframes pulse{0%{opacity:0.7}100%{opacity:1}}
-        /* evitar zoom en doble tap */
-        button, .list-item, .half-zone-left, .half-zone-right, .reset-btn, .clear-history{cursor:pointer;touch-action:manipulation}
+        .reset-btn{background:#0e1622;border:1px solid #3a4c62;padding:10px;border-radius:40px;margin-top:14px;width:100%}
+        .history-section{background:#0e1622;border-radius:28px;padding:14px;margin-top:14px}
+        .history-stats{display:flex;gap:12px;margin-bottom:10px;font-size:0.7rem}
+        .stat-card{background:#1a2538;padding:6px 8px;border-radius:20px;flex:1;text-align:center}
+        .history-list{max-height:130px;overflow-y:auto;font-size:0.7rem}
+        .history-item{background:#0f1825;padding:5px 8px;margin:3px 0;border-radius:20px;display:flex;justify-content:space-between}
+        .day-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.65rem;margin-right:6px}
+        .day-fuerte{background:#8b3a3a}
+        .day-liviano{background:#3a5a8b}
+        .day-recuperacion{background:#3a6b4a}
+        footer{text-align:center;font-size:0.6rem;color:#5f7f9e;margin-top:20px}
     </style>
 </head>
 <body>
 <div class="app">
-    <h1>🦀 CRABACODE · RUTINA</h1>
-    <div class="sub">toca · suma · constancia</div>
+    <h1>🦀 RENDIMIENTO VITAL</h1>
+    <div class="sub">bajar presión · energía · rendimiento sexual</div>
 
-    <!-- Gamificación: Estado del cuerpo -->
-    <div class="stats-row" id="statsRow">
-        <div class="stat-badge" id="gamificationStats">⚡ Energía 0 | 💪 Fuerza 0 | 🧠 Control 0</div>
-        <div class="motd" id="motdMessage">✨ Comienza tu día</div>
+    <!-- Estado vital y racha -->
+    <div class="vital-stats" id="vitalStats">
+        <div class="vital-row">
+            <span class="vital-item">❤️ Presión <span id="pressureStatus">⚖️ estable</span></span>
+            <span class="vital-item">🔄 Circulación <span id="circulationStatus">🌊 buena</span></span>
+            <span class="vital-item">⚡ Energía <span id="energyStatus">✨ activa</span></span>
+        </div>
+        <div class="vital-row">
+            <span class="vital-item">🔥 Racha: <strong id="streakDisplay">0</strong> días</span>
+            <span class="vital-item">🏆 Mejor: <strong id="bestStreakDisplay">0</strong></span>
+            <span class="vital-item">🎯 Semana: <strong id="weekProgress">0</strong>/7</span>
+        </div>
     </div>
 
+    <!-- Tarjeta de Bonus (si está disponible) -->
+    <div id="bonusContainer" style="display:none"></div>
+
+    <!-- Tarjeta de ejercicio actual -->
     <div class="card">
         <div class="header-card">
             <div class="titulo">
-                <span class="badge" id="exIndex">Ejercicio 1/7</span>
+                <span class="badge" id="dayBadge">LUNES · FUERTE A</span>
                 <strong id="exTitle">Elíptica / Marcha</strong>
             </div>
             <div class="target">
-                <span class="reps" id="targetReps">3-4 min</span>
-                <span class="desc" id="targetDesc">Mejora la circulación</span>
+                <span class="reps" id="targetReps">4 min</span>
+                <span class="desc" id="targetDesc">Mejora circulación</span>
             </div>
         </div>
-        <div class="img-area" id="imgContainer">
-            <img id="exerciseImg" src="1.png" alt="ejercicio" onerror="this.src='https://placehold.co/300x200/1a2538/6ea8fe?text=Cargando...'">
-        </div>
+        <div class="img-area"><img id="exerciseImg" src="1.png" onerror="this.src='https://placehold.co/300x160/1a2538/6ea8fe?text=Ejercicio'"></div>
         <div class="timer-area">
-            <div id="timeModeArea">
-                <div class="timer-circle" id="timerCircle">
-                    <div class="timer-num" id="timerDisplay">00:00</div>
-                    <div class="timer-label" id="timerLabel">temporizador</div>
-                </div>
-            </div>
+            <div id="timeModeArea"><div class="timer-circle" id="timerCircle"><div class="timer-num" id="timerDisplay">00:00</div><div class="timer-label" id="timerLabel">temporizador</div></div></div>
             <div id="repsModeArea" style="display:none">
-                <!-- ZONA TÁCTIL MEJORADA: toda el área clickeable por mitades -->
-                <div class="reps-touch-zone" id="repsTouchZone">
-                    <div style="text-align:center; margin-bottom:8px">
-                        <span class="touch-hint">👈 izquierda resta · derecha suma 👉</span>
-                    </div>
-                    <div class="split-zone">
-                        <div class="half-zone-left" id="touchLeftZone">➖ RESTAR</div>
-                        <div class="half-zone-right" id="touchRightZone">➕ SUMAR</div>
-                    </div>
-                </div>
-                <!-- Botones físicos grandes también funcionan (mejor UX dual) -->
-                <div class="counter-area">
-                    <button class="counter-btn" id="minusRepBtn">−</button>
-                    <div class="counter-value" id="repCounter">0</div>
-                    <button class="counter-btn" id="plusRepBtn">+</button>
-                </div>
-                <div>
-                    <span class="progress-badge">🎯 Objetivo: <span id="targetRepsCount">12</span> repeticiones</span>
-                    <button class="reset-counter" id="resetRepsBtn">⟳ Reiniciar conteo</button>
-                </div>
+                <div class="reps-touch-zone"><div style="text-align:center"><span class="touch-hint">👈 izquierda resta · derecha suma 👉</span></div>
+                <div class="split-zone"><div class="half-zone-left" id="touchLeftZone">➖ RESTAR</div><div class="half-zone-right" id="touchRightZone">➕ SUMAR</div></div></div>
+                <div class="counter-area"><button class="counter-btn" id="minusRepBtn">−</button><div class="counter-value" id="repCounter">0</div><button class="counter-btn" id="plusRepBtn">+</button></div>
+                <div><span class="progress-badge">🎯 Objetivo: <span id="targetRepsCount">12</span></span><button class="reset-counter" id="resetRepsBtn" style="background:#4a2f2f;padding:4px 12px;border-radius:40px;margin-left:8px">⟳</button></div>
             </div>
             <div class="progress-badge" id="hint">👟 prepárate</div>
-            <div class="buttons">
-                <button class="btn-primary" id="startBtn">▶ Iniciar</button>
-                <button class="btn-secondary" id="resetTimerBtn">⟳ Reiniciar</button>
-            </div>
+            <div class="buttons"><button class="btn-primary" id="startBtn">▶ Iniciar</button><button class="btn-secondary" id="resetTimerBtn">⟳ Reiniciar</button></div>
             <button class="complete-btn" id="completeBtn">✅ Completado · Siguiente ➜</button>
         </div>
     </div>
 
-    <div class="progress-section">
-        <div class="progress-title">📋 HOY: <span id="completedCount">0</span>/7 completados</div>
-        <div id="checklist"></div>
-        <button class="reset-btn" id="resetDayBtn">🔄 Reiniciar rutina (nuevo día)</button>
-    </div>
-
-    <div class="history-section">
-        <div class="history-title">
-            <span>📅 HISTORIAL DE CONSTANCIA</span>
-            <button class="clear-history" id="clearHistoryBtn">🗑️ Limpiar</button>
-        </div>
-        <div class="history-stats">
-            <div class="stat-card">✅ Días completados<br><strong id="totalDays">0</strong></div>
-            <div class="stat-card">🔥 Racha actual<br><strong id="currentStreak">0</strong></div>
-            <div class="stat-card">🏆 Mejor racha<br><strong id="bestStreak">0</strong></div>
-        </div>
-        <div id="historyList" class="history-list"><div style="text-align:center;color:#6a7a8a">📭 Aún no hay registros</div></div>
-        <div style="font-size:0.65rem;text-align:center;margin-top:8px;color:#5f7f9e">⭐ Se guarda automáticamente al completar la rutina</div>
-    </div>
-    <footer>🦀 www.crabacode.com.ar · táctil mejorado</footer>
+    <div class="progress-section"><div class="progress-title">📋 HOY: <span id="completedCount">0</span>/<span id="totalToday">6</span> completados</div><div id="checklist"></div><button class="reset-btn" id="resetDayBtn">🔄 Reiniciar día</button></div>
+    <div class="history-section"><div class="history-title">📅 HISTORIAL</div><div class="history-stats"><div class="stat-card">✅ Días<br><strong id="totalDays">0</strong></div><div class="stat-card">🔥 Racha<br><strong id="currentStreak">0</strong></div><div class="stat-card">🏆 Best<br><strong id="bestStreak">0</strong></div></div><div id="historyList" class="history-list"></div></div>
+    <footer>🦀 sistema de rendimiento · constancia = resultados reales</footer>
 </div>
 
 <script>
-    // ==================== EJERCICIOS (7 ejercicios, KEGELS incluido) ====================
-    const ejercicios = [
-        { nombre: "🚶 ELÍPTICA o MARCHA", img: "1.png", targetSeg: 210, esTiempo: true, texto: "3–4 minutos", desc: "Mejora la circulación general", tipoGamif: "energia" },
-        { nombre: "🏋️ SENTADILLAS PROFUNDAS", img: "2.png", targetRep: 12, esTiempo: false, texto: "10–15 repeticiones", desc: "Fortalece piernas y glúteos", tipoGamif: "fuerza" },
-        { nombre: "🍑 PUENTES DE GLÚTEO", img: "3.png", targetRep: 12, esTiempo: false, texto: "10–15 repeticiones", desc: "Activa glúteos y core", tipoGamif: "fuerza" },
-        { nombre: "🔄 ROTACIONES (Lumbares)", img: "4.png", targetRep: 9, esTiempo: false, texto: "8–10 reps (por lado)", desc: "Movilidad de columna", tipoGamif: "control" },
-        { nombre: "💪 PLANCHA (Plank)", img: "5.png", targetSeg: 25, esTiempo: true, texto: "20–30 segundos", desc: "Fortalece todo el core", tipoGamif: "fuerza" },
-        { nombre: "🧘 ESTIRAMIENTO FINAL", img: "6.png", targetSeg: 90, esTiempo: true, texto: "1–2 minutos", desc: "Relaja músculos y flexibilidad", tipoGamif: "energia" },
-        { nombre: "🫀 SUELO PÉLVICO (KEGELS)", img: "7.png", targetSeg: 75, esTiempo: true, texto: "10 contracciones x 5 seg", desc: "Mejora control, circulación y resistencia", tipoGamif: "control", esKegel: true }
-    ];
-
-    // Gamificación
-    let gamificacion = { energia: 0, fuerza: 0, control: 0 };
-    let completados = new Array(ejercicios.length).fill(false);
-    let current = 0;
-    let timer = null, activo = false, tiempoActual = 0, objetivo = 0, modoTime = true;
-    let repActual = 0;
+    // ==================== RUTINA SEMANAL ====================
+    const diasSemana = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+    const tiposDia = {
+        1: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"], bonus: false },
+        2: { nombre: "LIVIANO", ejercicios: ["cardio", "rotaciones", "estiramiento", "kegels"], bonus: false },
+        3: { nombre: "FUERTE B", ejercicios: ["cardio", "flexiones", "remo", "kegels", "estiramiento"], bonus: false },
+        4: { nombre: "LIVIANO", ejercicios: ["cardio", "movilidad", "kegels"], bonus: false },
+        5: { nombre: "FUERTE A", ejercicios: ["cardio", "sentadillas", "puente", "plancha", "kegels"], bonus: false },
+        6: { nombre: "MIX SUAVE", ejercicios: ["cardio", "sentadillas", "flexiones", "kegels"], bonus: false },
+        0: { nombre: "RECUPERACIÓN", ejercicios: ["estiramiento"], bonus: true } // domingo opcional
+    };
     
-    // Variables Kegels
-    let kegelInterval = null;
-    let kegelPhase = "relax";
+    const ejerciciosDB = {
+        cardio: { nombre: "🚶 CARDIO (marcha)", img: "1.png", defaultSeg: 240, esTiempo: true, texto: "3–4 min", desc: "Mejora circulación y presión", tipoGamif: "energia" },
+        sentadillas: { nombre: "🏋️ SENTADILLAS", img: "2.png", defaultRep: 12, esTiempo: false, texto: "12 repeticiones", desc: "Fortalece piernas y suelo pélvico", tipoGamif: "fuerza" },
+        puente: { nombre: "🍑 PUENTES DE GLÚTEO", img: "3.png", defaultRep: 12, esTiempo: false, texto: "12 repeticiones", desc: "Activa glúteos y core", tipoGamif: "fuerza" },
+        rotaciones: { nombre: "🔄 ROTACIONES", img: "4.png", defaultRep: 8, esTiempo: false, texto: "8 reps por lado", desc: "Movilidad de columna", tipoGamif: "control" },
+        plancha: { nombre: "💪 PLANCHA", img: "5.png", defaultSeg: 25, esTiempo: true, texto: "25 segundos", desc: "Fortalece todo el core", tipoGamif: "fuerza" },
+        estiramiento: { nombre: "🧘 ESTIRAMIENTO", img: "6.png", defaultSeg: 90, esTiempo: true, texto: "2 minutos", desc: "Relaja músculos y mejora flexibilidad", tipoGamif: "energia" },
+        kegels: { nombre: "🫀 KEGELS (suelo pélvico)", img: "7.png", defaultSeg: 75, esTiempo: true, texto: "10 ciclos", desc: "Mejora control, circulación y rendimiento sexual", tipoGamif: "control", esKegel: true },
+        flexiones: { nombre: "💪 FLEXIONES", img: "2.png", defaultRep: 8, esTiempo: false, texto: "8–12 repeticiones", desc: "Tren superior", tipoGamif: "fuerza" },
+        remo: { nombre: "🧲 REMO (banda/peso)", img: "4.png", defaultRep: 10, esTiempo: false, texto: "10 repeticiones", desc: "Espalda y control", tipoGamif: "fuerza" },
+        movilidad: { nombre: "🔄 MOVILIDAD GENERAL", img: "4.png", defaultSeg: 120, esTiempo: true, texto: "2 minutos", desc: "Articulaciones suaves", tipoGamif: "control" }
+    };
     
-    // Historial mejorado
-    let historial = []; 
+    // Progresión global (cada 2 semanas)
+    let progresion = { semana: 0, planchaBonus: 0, repBonus: 0, kegelBonus: 0 };
+    
+    // Estado
+    let currentEjercicioIdx = 0, ejerciciosHoy = [], completadosHoy = [];
+    let timer=null, activo=false, tiempoActual=0, objetivo=0, modoTime=true, repActual=0;
+    let kegelInterval=null, kegelPhase="relax";
+    let gamificacion = { energia:0, fuerza:0, control:0 };
+    let historial = [];
+    let rachaActual = 0, mejorRacha = 0;
+    let bonusDisponible = false, bonusTipo = null, bonusUsadoHoy = false;
     let audioCtx = null;
     
-    // ========== FEEDBACK TÁCTIL Y SONORO MEJORADO ==========
-    function playBeep() {
-        try {
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = 880;
-            gain.gain.value = 0.15;
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.25);
-            osc.stop(audioCtx.currentTime + 0.25);
-        } catch(e) { /* silencio */ }
-    }
-    
-    function vibrateShort() {
-        if(navigator.vibrate) navigator.vibrate(30);
-    }
-    
-    // Vibración especial para Kegels (patrón contracción/relajación)
-    function vibrateKegelTransition() {
-        if(navigator.vibrate) navigator.vibrate([30,50,30]);
-    }
-    
-    // ========== DOM ==========
+    // DOM
     const dom = {
-        exIndex: document.getElementById("exIndex"), exTitle: document.getElementById("exTitle"),
-        targetReps: document.getElementById("targetReps"), targetDesc: document.getElementById("targetDesc"),
-        exerciseImg: document.getElementById("exerciseImg"), timerDisplay: document.getElementById("timerDisplay"),
-        timerLabel: document.getElementById("timerLabel"), hint: document.getElementById("hint"),
-        startBtn: document.getElementById("startBtn"), resetTimerBtn: document.getElementById("resetTimerBtn"),
-        completeBtn: document.getElementById("completeBtn"), completedCount: document.getElementById("completedCount"),
+        exTitle: document.getElementById("exTitle"), targetReps: document.getElementById("targetReps"),
+        targetDesc: document.getElementById("targetDesc"), exerciseImg: document.getElementById("exerciseImg"),
+        timerDisplay: document.getElementById("timerDisplay"), timerLabel: document.getElementById("timerLabel"),
+        hint: document.getElementById("hint"), startBtn: document.getElementById("startBtn"),
+        resetTimerBtn: document.getElementById("resetTimerBtn"), completeBtn: document.getElementById("completeBtn"),
+        completedCount: document.getElementById("completedCount"), totalToday: document.getElementById("totalToday"),
         checklist: document.getElementById("checklist"), resetDayBtn: document.getElementById("resetDayBtn"),
         timeModeArea: document.getElementById("timeModeArea"), repsModeArea: document.getElementById("repsModeArea"),
         repCounter: document.getElementById("repCounter"), targetRepsCount: document.getElementById("targetRepsCount"),
         minusRepBtn: document.getElementById("minusRepBtn"), plusRepBtn: document.getElementById("plusRepBtn"),
-        resetRepsBtn: document.getElementById("resetRepsBtn"),
+        resetRepsBtn: document.getElementById("resetRepsBtn"), timerCircle: document.getElementById("timerCircle"),
+        dayBadge: document.getElementById("dayBadge"), streakDisplay: document.getElementById("streakDisplay"),
+        bestStreakDisplay: document.getElementById("bestStreakDisplay"), weekProgress: document.getElementById("weekProgress"),
         totalDays: document.getElementById("totalDays"), currentStreak: document.getElementById("currentStreak"),
         bestStreak: document.getElementById("bestStreak"), historyList: document.getElementById("historyList"),
-        clearHistoryBtn: document.getElementById("clearHistoryBtn"), timerCircle: document.getElementById("timerCircle"),
-        gamificationStats: document.getElementById("gamificationStats"), motdMessage: document.getElementById("motdMessage"),
-        touchLeftZone: document.getElementById("touchLeftZone"), touchRightZone: document.getElementById("touchRightZone")
+        bonusContainer: document.getElementById("bonusContainer"), pressureStatus: document.getElementById("pressureStatus"),
+        circulationStatus: document.getElementById("circulationStatus"), energyStatus: document.getElementById("energyStatus")
     };
     
-    // ========== GAMIFICACIÓN ==========
-    function actualizarGamificacionUI() {
-        dom.gamificationStats.innerHTML = `⚡ Energía ${gamificacion.energia} | 💪 Fuerza ${gamificacion.fuerza} | 🧠 Control ${gamificacion.control}`;
-        const { streakActual } = calcularRachas();
-        let msg = "";
-        if(streakActual >= 6) msg = "🔥 Modo bestia activado";
-        else if(streakActual >= 3) msg = "Vas firme 💪";
-        else if(streakActual >= 1) msg = "Buen comienzo 🌱";
-        else msg = "✨ Cada día suma";
-        dom.motdMessage.innerText = msg;
+    // Helper
+    function getDiaActual() { return new Date().getDay(); }
+    function playBeep() { try { if(!audioCtx) audioCtx=new AudioContext(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value=880; g.gain.value=0.1; o.start(); g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.2); o.stop(audioCtx.currentTime+0.2); } catch(e){} }
+    function vibrateShort(){ if(navigator.vibrate) navigator.vibrate(20); }
+    function vibrateKegel(){ if(navigator.vibrate) navigator.vibrate([30,40,30]); }
+    
+    // Cargar rutina del día con progresión
+    function cargarRutinaDelDia() {
+        const dia = getDiaActual();
+        const tipo = tiposDia[dia];
+        dom.dayBadge.innerHTML = `${diasSemana[dia]} · ${tipo.nombre}`;
+        let ejerciciosClaves = [...tipo.ejercicios];
+        // Aplicar progresión cada 2 semanas
+        const semanasActivas = Math.floor(historial.length / 14);
+        progresion.semana = semanasActivas;
+        const repExtra = Math.min(semanasActivas, 5);
+        const planchaExtra = Math.min(semanasActivas * 5, 15);
+        const kegelExtra = Math.min(semanasActivas, 3);
+        
+        ejerciciosHoy = ejerciciosClaves.map(key => {
+            let base = {...ejerciciosDB[key]};
+            if(key === "plancha") base.defaultSeg = Math.min(25 + planchaExtra, 45);
+            if(key === "sentadillas" || key === "puente" || key === "flexiones" || key === "remo") base.defaultRep = Math.min(base.defaultRep + repExtra, 20);
+            if(key === "kegels") base.defaultSeg = Math.min(75 + kegelExtra*5, 95);
+            return base;
+        });
+        completadosHoy = new Array(ejerciciosHoy.length).fill(false);
+        dom.totalToday.innerText = ejerciciosHoy.length;
+        return ejerciciosHoy;
     }
     
-    function sumarPuntajePorEjercicio(idx) {
-        const ex = ejercicios[idx];
-        if(ex.tipoGamif === "energia") gamificacion.energia++;
-        else if(ex.tipoGamif === "fuerza") gamificacion.fuerza++;
-        else if(ex.tipoGamif === "control") gamificacion.control++;
-        actualizarGamificacionUI();
+    function actualizarChecklist() {
+        let html = "";
+        ejerciciosHoy.forEach((ex, i) => {
+            html += `<div class="list-item ${completadosHoy[i]?'completed':''}" data-idx="${i}"><span>${completadosHoy[i]?'✅':'⭕'} ${ex.nombre}</span><span style="font-size:0.65rem">${ex.texto}</span></div>`;
+        });
+        dom.checklist.innerHTML = html;
+        dom.completedCount.innerText = completadosHoy.filter(v=>v).length;
+        document.querySelectorAll('.list-item').forEach(el => {
+            el.addEventListener('click', (e) => { let idx=parseInt(el.dataset.idx); if(!isNaN(idx) && idx!==currentEjercicioIdx && !completadosHoy[idx] && confirm("¿Saltar?")){ pausarTimer(); currentEjercicioIdx=idx; cargarEjercicioActual(); } });
+        });
     }
     
-    // ========== HISTORIAL MEJORADO ==========
-    function getTodayKey() { return new Date().toISOString().split('T')[0]; }
-    function cargarHistorial() {
-        const saved = localStorage.getItem("crabacode_historial_v2");
-        historial = saved ? JSON.parse(saved) : [];
-        actualizarVistaHistorial();
-        actualizarGamificacionUI();
-    }
-    function guardarHistorial() { localStorage.setItem("crabacode_historial_v2", JSON.stringify(historial)); actualizarVistaHistorial(); }
-    function registrarDiaCompletado(totalEjerciciosHechos) {
-        const hoy = getTodayKey();
-        const existente = historial.find(h => h.fecha === hoy);
-        if(existente) existente.totalEjercicios = totalEjerciciosHechos;
-        else historial.push({ fecha: hoy, totalEjercicios: totalEjerciciosHechos });
-        historial.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-        guardarHistorial();
-    }
-    function calcularRachas() {
-        const fechas = historial.map(h => h.fecha).sort();
-        let streakActual = 0, bestStreak = 0;
-        const hoy = getTodayKey();
-        const hoyCompletado = historial.some(h => h.fecha === hoy);
-        if(!hoyCompletado) streakActual = 0;
-        else {
-            let currentDate = new Date(hoy);
-            let streak = 1;
-            let checkDate = new Date(currentDate);
-            while(true) {
-                checkDate.setDate(checkDate.getDate() - 1);
-                const fechaStr = checkDate.toISOString().split('T')[0];
-                if(historial.some(h => h.fecha === fechaStr)) streak++;
-                else break;
-            }
-            streakActual = streak;
-        }
-        let tempStreak = 0, lastDate = null;
-        const allDates = historial.map(h => h.fecha).sort();
-        for(let i=0; i<allDates.length; i++) {
-            const currentDate = new Date(allDates[i]);
-            if(lastDate === null) tempStreak = 1;
-            else { const diffDays = (currentDate - new Date(lastDate)) / (1000*60*60*24); if(diffDays === 1) tempStreak++; else tempStreak = 1; }
-            bestStreak = Math.max(bestStreak, tempStreak);
-            lastDate = allDates[i];
-        }
-        return { streakActual, bestStreak };
-    }
-    function actualizarVistaHistorial() {
-        const total = historial.length;
-        const { streakActual, bestStreak } = calcularRachas();
-        dom.totalDays.innerText = total;
-        dom.currentStreak.innerText = streakActual;
-        dom.bestStreak.innerText = bestStreak;
-        if(historial.length === 0) dom.historyList.innerHTML = '<div style="text-align:center;color:#6a7a8a">📭 Aún no hay registros</div>';
-        else {
-            const ultimos = historial.slice(0, 14);
-            dom.historyList.innerHTML = ultimos.map(h => `<div class="history-item"><span>📆 ${new Date(h.fecha).toLocaleDateString('es-AR')}</span><span>✅ ${h.totalEjercicios}/${ejercicios.length} ejercicios</span></div>`).join('');
-            if(historial.length > 14) dom.historyList.innerHTML += `<div style="text-align:center;color:#5f7f9e;margin-top:4px">... y ${historial.length-14} días más</div>`;
-        }
-        actualizarGamificacionUI();
-    }
-    function limpiarHistorial() { if(confirm("¿Borrar todo el historial?")) { historial = []; guardarHistorial(); } }
-    
-    // ========== KEGELS ==========
-    function detenerKegelLoop() { if(kegelInterval) { clearInterval(kegelInterval); kegelInterval = null; } }
-    function aplicarColorKegel() {
-        if(kegelPhase === "contract") { dom.timerCircle.classList.add("kegel-contract"); dom.timerCircle.classList.remove("kegel-relax"); }
-        else { dom.timerCircle.classList.add("kegel-relax"); dom.timerCircle.classList.remove("kegel-contract"); }
-    }
-    function actualizarHintKegel() {
-        if(kegelPhase === "contract") dom.hint.innerHTML = "🔴 ¡CONTRAE! (mantén 5 seg)";
-        else dom.hint.innerHTML = "🔵 RELAJA (respira 5 seg)";
-    }
-    function iniciarKegelLoop() {
-        detenerKegelLoop();
-        kegelPhase = "contract";
-        actualizarHintKegel();
-        aplicarColorKegel();
-        kegelInterval = setInterval(() => {
-            if(!activo) return;
-            kegelPhase = (kegelPhase === "contract") ? "relax" : "contract";
-            actualizarHintKegel();
-            aplicarColorKegel();
-            vibrateKegelTransition();  // feedback táctil especial al cambiar fase
-        }, 5000);
-    }
-    function resetearEstiloKegel() { dom.timerCircle.classList.remove("kegel-contract","kegel-relax"); }
-    
-    // ========== LÓGICA PRINCIPAL (sin romper nada) ==========
-    function pausarTimer() { if(timer) { clearInterval(timer); timer=null; } detenerKegelLoop(); activo = false; dom.startBtn.innerText = "▶ Iniciar"; }
-    function reiniciarTimerUI() {
-        if(completados[current]) { dom.hint.innerText = "Ejercicio ya completado."; return; }
-        pausarTimer();
-        if(modoTime) {
-            tiempoActual = 0; dom.timerDisplay.innerText = "00:00";
-            dom.hint.innerText = `🕒 Reiniciado. Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
-            if(ejercicios[current].esKegel) { detenerKegelLoop(); resetearEstiloKegel(); kegelPhase = "relax"; actualizarHintKegel(); }
-        } else { repActual = 0; dom.repCounter.innerText = "0"; dom.hint.innerText = `🔄 Conteo reiniciado. Haz ${objetivo} repeticiones.`; }
-    }
-    function iniciarModo() {
-        if(completados[current]) { dom.hint.innerText = "⚠️ Ya completaste esto."; return; }
-        const exActual = ejercicios[current];
-        if(modoTime) {
-            if(activo) pausarTimer();
-            else {
-                activo = true; dom.startBtn.innerText = "⏸ Pausa";
-                if(exActual.esKegel) iniciarKegelLoop();
-                else { detenerKegelLoop(); resetearEstiloKegel(); }
-                timer = setInterval(() => {
-                    if(!activo) return;
-                    tiempoActual++;
-                    let mins = Math.floor(tiempoActual/60), segs = tiempoActual%60;
-                    dom.timerDisplay.innerText = `${mins.toString().padStart(2,'0')}:${segs.toString().padStart(2,'0')}`;
-                    if(tiempoActual >= objetivo) dom.hint.innerHTML = "🎯 ¡Objetivo cumplido! Presiona Completado";
-                    else if(!exActual.esKegel) dom.hint.innerHTML = `⏳ Avanzando ${mins}:${segs.toString().padStart(2,'0')} / ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
-                }, 1000);
-            }
-        } else dom.hint.innerText = `➕ Usa los botones o toca las zonas izquierda/derecha para contar reps.`;
-    }
-    
-    // ========== MEJORA TÁCTIL PARA REPETICIONES (con vibración y sonido) ==========
-    function actualizarContadorReps(delta) {
-        if(completados[current]) return;
-        let nuevo = repActual + delta;
-        if(nuevo < 0) nuevo = 0;
-        repActual = nuevo;
-        dom.repCounter.innerText = repActual;
-        // FEEDBACK TÁCTIL + SONIDO en cada toque de repetición
-        vibrateShort();
-        playBeep();
-        if(repActual >= objetivo) dom.hint.innerHTML = `🎯 ¡Objetivo cumplido! (${repActual}/${objetivo}) ✅`;
-        else dom.hint.innerHTML = `🔁 Llevas ${repActual} de ${objetivo} repeticiones. Sigue así.`;
-    }
-    
-    // Manejadores táctiles por zona (mitad izquierda/derecha) - NO elimina botones originales
-    function handleTouchLeft() { if(!modoTime && !completados[current]) actualizarContadorReps(-1); }
-    function handleTouchRight() { if(!modoTime && !completados[current]) actualizarContadorReps(1); }
-    
-    function cargarEjercicio(idx) {
+    function cargarEjercicioActual() {
         pausarTimer(); resetearEstiloKegel();
-        const ex = ejercicios[idx];
-        dom.exIndex.innerText = `Ejercicio ${idx+1}/${ejercicios.length}`;
+        const ex = ejerciciosHoy[currentEjercicioIdx];
+        if(!ex) return;
         dom.exTitle.innerText = ex.nombre;
         dom.targetReps.innerText = ex.texto;
         dom.targetDesc.innerText = ex.desc;
         dom.exerciseImg.src = ex.img;
         modoTime = ex.esTiempo;
-        if(modoTime) {
-            dom.timeModeArea.style.display = "block";
-            dom.repsModeArea.style.display = "none";
-            objetivo = ex.targetSeg;
+        if(modoTime){
+            dom.timeModeArea.style.display="block";
+            dom.repsModeArea.style.display="none";
+            objetivo = ex.defaultSeg;
             dom.timerLabel.innerText = ex.esKegel ? "🔄 Kegels · contrae/relaja" : "⏱️ temporizador";
-            tiempoActual = 0; dom.timerDisplay.innerText = "00:00";
-            if(ex.esKegel) { dom.hint.innerText = "🔵 Prepárate: iniciar ciclo Kegels"; kegelPhase = "relax"; actualizarHintKegel(); }
-            else dom.hint.innerText = `🕒 Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
+            tiempoActual=0; dom.timerDisplay.innerText="00:00";
+            if(ex.esKegel){ dom.hint.innerText="🔵 Prepárate: Kegels"; kegelPhase="relax"; actualizarHintKegel(); }
+            else dom.hint.innerText=`🕒 Meta: ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`;
         } else {
-            dom.timeModeArea.style.display = "none";
-            dom.repsModeArea.style.display = "block";
-            objetivo = ex.targetRep;
+            dom.timeModeArea.style.display="none";
+            dom.repsModeArea.style.display="block";
+            objetivo = ex.defaultRep;
             dom.targetRepsCount.innerText = objetivo;
-            repActual = 0;
-            dom.repCounter.innerText = "0";
-            dom.hint.innerText = `🏋️ Toca IZQUIERDA (➖) o DERECHA (➕) · Botones grandes también funcionan. Objetivo: ${objetivo} reps.`;
+            repActual=0; dom.repCounter.innerText="0";
+            dom.hint.innerText=`🏋️ Toca izquierda/derecha o botones. Objetivo: ${objetivo} reps.`;
         }
-        const completado = completados[idx];
+        const completado = completadosHoy[currentEjercicioIdx];
         dom.completeBtn.innerText = completado ? "✅ Ya completado · Siguiente ➜" : "✅ Completado · Siguiente ➜";
         dom.startBtn.disabled = completado;
         dom.resetTimerBtn.disabled = completado;
-        if(!modoTime) { dom.minusRepBtn.disabled = completado; dom.plusRepBtn.disabled = completado; dom.resetRepsBtn.disabled = completado; }
-        activo = false;
-        dom.startBtn.innerText = modoTime ? "▶ Iniciar" : "🎯 Empezar (marca reps)";
+        if(!modoTime){ dom.minusRepBtn.disabled=completado; dom.plusRepBtn.disabled=completado; dom.resetRepsBtn.disabled=completado; }
+        activo=false; dom.startBtn.innerText = modoTime ? "▶ Iniciar" : "🎯 Empezar";
     }
     
-    function completarYAvanzar() {
-        if(completados[current]) { avanzarSiguiente(); return; }
-        const exActual = ejercicios[current];
-        let objetivoAlcanzado = modoTime ? (tiempoActual >= objetivo) : (repActual >= objetivo);
-        if(!objetivoAlcanzado && !confirm(`Aún no alcanzaste la meta (${modoTime?tiempoActual+"/"+objetivo+" seg":repActual+"/"+objetivo+" reps"}). ¿Marcar completado igual?`)) return;
-        if(objetivoAlcanzado) { vibrateShort(); playBeep(); dom.hint.innerHTML = "🎉 ¡Excelente! +1 punto"; }
-        sumarPuntajePorEjercicio(current);
-        completados[current] = true;
+    function pausarTimer(){ if(timer){clearInterval(timer);timer=null;} if(kegelInterval){clearInterval(kegelInterval);kegelInterval=null;} activo=false; dom.startBtn.innerText="▶ Iniciar"; }
+    function resetearEstiloKegel(){ dom.timerCircle.classList.remove("kegel-contract","kegel-relax"); }
+    function actualizarHintKegel(){ dom.hint.innerHTML = kegelPhase==="contract" ? "🔴 ¡CONTRAE! (5 seg)" : "🔵 RELAJA (5 seg)"; }
+    function iniciarKegelLoop(){ if(kegelInterval) clearInterval(kegelInterval); kegelPhase="contract"; actualizarHintKegel(); aplicarColorKegel(); kegelInterval=setInterval(()=>{ if(!activo) return; kegelPhase=kegelPhase==="contract"?"relax":"contract"; actualizarHintKegel(); aplicarColorKegel(); vibrateKegel(); },5000); }
+    function aplicarColorKegel(){ if(kegelPhase==="contract"){ dom.timerCircle.classList.add("kegel-contract"); dom.timerCircle.classList.remove("kegel-relax"); } else { dom.timerCircle.classList.add("kegel-relax"); dom.timerCircle.classList.remove("kegel-contract"); } }
+    
+    function iniciarModo(){
+        if(completadosHoy[currentEjercicioIdx]){ dom.hint.innerText="Ya completado"; return; }
+        const ex = ejerciciosHoy[currentEjercicioIdx];
+        if(modoTime){
+            if(activo) pausarTimer();
+            else {
+                activo=true; dom.startBtn.innerText="⏸ Pausa";
+                if(ex.esKegel) iniciarKegelLoop();
+                else { if(kegelInterval) clearInterval(kegelInterval); resetearEstiloKegel(); }
+                timer=setInterval(()=>{ if(!activo) return; tiempoActual++; let m=Math.floor(tiempoActual/60), s=tiempoActual%60; dom.timerDisplay.innerText=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(tiempoActual>=objetivo) dom.hint.innerHTML="🎯 ¡Objetivo cumplido!"; else if(!ex.esKegel) dom.hint.innerHTML=`⏳ ${m}:${s.toString().padStart(2,'0')} / ${Math.floor(objetivo/60)}:${(objetivo%60).toString().padStart(2,'0')}`; },1000);
+            }
+        } else dom.hint.innerText="Usa + / - o zonas táctiles";
+    }
+    
+    function actualizarContadorReps(delta){
+        if(completadosHoy[currentEjercicioIdx]) return;
+        let nuevo=repActual+delta; if(nuevo<0) nuevo=0;
+        repActual=nuevo; dom.repCounter.innerText=repActual;
+        vibrateShort(); playBeep();
+        if(repActual>=objetivo) dom.hint.innerHTML=`🎯 ¡Objetivo cumplido! (${repActual}/${objetivo}) ✅`;
+        else dom.hint.innerHTML=`🔁 ${repActual}/${objetivo} repeticiones`;
+    }
+    
+    function sumarGamificacion(ex){
+        if(ex.tipoGamif==="energia") gamificacion.energia++;
+        else if(ex.tipoGamif==="fuerza") gamificacion.fuerza++;
+        else if(ex.tipoGamif==="control") gamificacion.control++;
+        actualizarEstadoVital();
+    }
+    
+    function actualizarEstadoVital(){
+        const totalEnergia = gamificacion.energia;
+        const totalFuerza = gamificacion.fuerza;
+        const totalControl = gamificacion.control;
+        dom.pressureStatus.innerText = totalControl>=5 ? "📉 excelente" : (totalControl>=2 ? "⚖️ estable" : "⚠️ mejorar");
+        dom.circulationStatus.innerText = totalEnergia>=4 ? "🌊 muy buena" : (totalEnergia>=2 ? "🌊 buena" : "🌊 regular");
+        dom.energyStatus.innerText = totalEnergia+totalFuerza>=6 ? "⚡ alta" : (totalEnergia+totalFuerza>=3 ? "✨ media" : "😴 baja");
+    }
+    
+    function completarYAvanzar(){
+        if(completadosHoy[currentEjercicioIdx]){ avanzarSiguiente(); return; }
+        const ex = ejerciciosHoy[currentEjercicioIdx];
+        let alcanzado = modoTime ? (tiempoActual>=objetivo) : (repActual>=objetivo);
+        if(!alcanzado && !confirm(`¿Completar igual? (${modoTime?tiempoActual+"/"+objetivo+" seg":repActual+"/"+objetivo+" reps"})`)) return;
+        if(alcanzado){ vibrateShort(); playBeep(); }
+        sumarGamificacion(ex);
+        completadosHoy[currentEjercicioIdx]=true;
         pausarTimer();
         actualizarChecklist();
-        if(completados.every(v=>v)) { registrarDiaCompletado(completados.filter(v=>v).length); dom.hint.innerText = "🏆 ¡RUTINA COMPLETA!"; dom.completeBtn.innerText = "🏆 Finalizado"; dom.startBtn.disabled = true; dom.resetTimerBtn.disabled = true; if(!modoTime){ dom.minusRepBtn.disabled=true; dom.plusRepBtn.disabled=true; } return; }
+        if(completadosHoy.every(v=>v)){ finalizarDia(); return; }
         avanzarSiguiente();
     }
     
-    function avanzarSiguiente() {
-        let next = -1;
-        for(let i=0; i<ejercicios.length; i++) if(!completados[i]) { next=i; break; }
-        if(next !== -1) { current = next; cargarEjercicio(current); }
-        else { current = ejercicios.length-1; cargarEjercicio(current); dom.completeBtn.innerText = "🏁 Completado"; dom.startBtn.disabled=true; dom.resetTimerBtn.disabled=true; }
+    function finalizarDia(){
+        const hoy=new Date().toISOString().split('T')[0];
+        const existe=historial.find(h=>h.fecha===hoy);
+        if(!existe){
+            const completadosTotal = completadosHoy.filter(v=>v).length;
+            historial.push({ fecha:hoy, total:completadosTotal, ejercicios:completadosTotal });
+            historial.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
+            localStorage.setItem("crabacode_historial_final", JSON.stringify(historial));
+            calcularRachas();
+        }
+        dom.hint.innerText="🏆 ¡DÍA COMPLETADO! +1 para tu rendimiento";
+        dom.completeBtn.innerText="🏆 Finalizado";
+        dom.startBtn.disabled=true;
+        actualizarHistorialUI();
+        verificarBonusPorRacha();
+    }
+    
+    function avanzarSiguiente(){
+        let next=-1; for(let i=0;i<ejerciciosHoy.length;i++) if(!completadosHoy[i]){ next=i; break; }
+        if(next!==-1){ currentEjercicioIdx=next; cargarEjercicioActual(); }
+        else finalizarDia();
         actualizarChecklist();
     }
     
-    function actualizarChecklist() {
-        let html = "";
-        ejercicios.forEach((ex, i) => {
-            let clase = completados[i] ? "list-item completed" : "list-item";
-            let check = completados[i] ? "✅" : "⭕";
-            html += `<div class="${clase}" data-idx="${i}"><span>${check} ${ex.nombre}</span><span style="font-size:0.7rem;background:#1f2c3c;padding:2px 8px;border-radius:40px;">${ex.texto}</span></div>`;
-        });
-        dom.checklist.innerHTML = html;
-        document.querySelectorAll('.list-item').forEach(el => { el.addEventListener('click', (e) => { const idx = parseInt(el.dataset.idx); if(!isNaN(idx) && idx !== current && !completados[idx] && confirm(`¿Saltar a ${ejercicios[idx].nombre}?`)) { pausarTimer(); current = idx; cargarEjercicio(current); } }); });
-        dom.completedCount.innerText = completados.filter(v=>v).length;
+    function calcularRachas(){
+        let streak=0, best=0, temp=0, last=null;
+        const fechas = historial.map(h=>h.fecha).sort();
+        for(let f of fechas){
+            if(last===null) temp=1;
+            else{ const diff=(new Date(f)-new Date(last))/(1000*60*60*24); if(diff===1) temp++; else temp=1; }
+            best=Math.max(best,temp);
+            last=f;
+        }
+        const hoy=new Date().toISOString().split('T')[0];
+        const hoyCompleto=historial.some(h=>h.fecha===hoy);
+        if(hoyCompleto){
+            let c=1, d=new Date(hoy);
+            while(true){ d.setDate(d.getDate()-1); const fd=d.toISOString().split('T')[0]; if(historial.some(h=>h.fecha===fd)) c++; else break; }
+            streak=c;
+        } else streak=0;
+        rachaActual=streak; mejorRacha=best;
+        dom.streakDisplay.innerText=rachaActual;
+        dom.bestStreakDisplay.innerText=mejorRacha;
+        dom.currentStreak.innerText=rachaActual;
+        dom.bestStreak.innerText=mejorRacha;
+        const semana=historial.filter(h=>{ const d=new Date(h.fecha); const hoySemana=new Date(); const inicioSemana=new Date(hoySemana); inicioSemana.setDate(hoySemana.getDate()-hoySemana.getDay()); return d>=inicioSemana; }).length;
+        dom.weekProgress.innerText=semana;
+        return {rachaActual,mejorRacha};
     }
-    function reiniciarDia() { if(confirm("¿Reiniciar rutina?")) { pausarTimer(); completados.fill(false); current=0; cargarEjercicio(0); actualizarChecklist(); dom.hint.innerText="🌅 Día reiniciado."; } }
     
-    // Eventos MEJORADOS manteniendo botones originales + zonas táctiles
-    dom.startBtn.onclick = iniciarModo;
-    dom.resetTimerBtn.onclick = reiniciarTimerUI;
-    dom.completeBtn.onclick = completarYAvanzar;
-    dom.resetDayBtn.onclick = reiniciarDia;
-    dom.clearHistoryBtn.onclick = limpiarHistorial;
-    dom.plusRepBtn.onclick = () => actualizarContadorReps(1);
-    dom.minusRepBtn.onclick = () => actualizarContadorReps(-1);
-    dom.resetRepsBtn.onclick = () => { repActual = 0; dom.repCounter.innerText = "0"; dom.hint.innerText = `Conteo reiniciado. Objetivo: ${objetivo} reps`; };
-    if(dom.touchLeftZone) dom.touchLeftZone.addEventListener("click", handleTouchLeft);
-    if(dom.touchRightZone) dom.touchRightZone.addEventListener("click", handleTouchRight);
+    function actualizarHistorialUI(){
+        const ultimos=historial.slice(0,10);
+        dom.historyList.innerHTML=ultimos.map(h=>`<div class="history-item"><span>📆 ${new Date(h.fecha).toLocaleDateString('es-AR')}</span><span>✅ ${h.total}/${ejerciciosHoy.length} ejercicios</span></div>`).join('');
+        dom.totalDays.innerText=historial.length;
+        calcularRachas();
+    }
     
-    cargarHistorial();
+    function verificarBonusPorRacha(){
+        // Bonus por racha: 3 días → bonus básico, 6 días → bonus pro
+        if(rachaActual>=6 && !bonusUsadoHoy && bonusDisponible===false){
+            bonusDisponible=true;
+            bonusTipo="pro";
+            mostrarBonus();
+        } else if(rachaActual>=3 && !bonusUsadoHoy && bonusDisponible===false){
+            bonusDisponible=true;
+            bonusTipo="basico";
+            mostrarBonus();
+        }
+    }
+    
+    function mostrarBonus(){
+        if(!bonusDisponible) return;
+        const opciones = bonusTipo==="basico" ? 
+            [{nombre:"🟢 Bonus Básico", desc:"Cardio suave 3min + Estiramientos 5min + Kegels 6 ciclos (6-8 min)", tipo:"basico"}] :
+            [{nombre:"🔵 Modo Zen", desc:"Respiración + estiramientos 7min · baja estrés", tipo:"zen"},
+             {nombre:"🔴 Modo Sangre", desc:"Cardio suave 6min · mejora circulación", tipo:"sangre"},
+             {nombre:"⚪ Skip inteligente", desc:"Descanso activo · cuenta como día completado", tipo:"skip"}];
+        dom.bonusContainer.style.display="block";
+        dom.bonusContainer.innerHTML = `<div class="bonus-card" id="bonusCard"><div class="bonus-title">🎁 BONUS DISPONIBLE (racha ${rachaActual} días)</div><div id="bonusOptions"></div><div class="bonus-desc" style="margin-top:8px">⚠️ Máximo 2 por semana · no días seguidos</div></div>`;
+        const optsDiv = document.getElementById("bonusOptions");
+        optsDiv.innerHTML = opciones.map((opt,i)=>`<div class="bonus-opt" data-opt="${i}" style="background:#1f2a3a;margin:6px 0;padding:8px;border-radius:24px;cursor:pointer"><strong>${opt.nombre}</strong><div style="font-size:0.7rem">${opt.desc}</div></div>`).join('');
+        document.querySelectorAll('.bonus-opt').forEach(el=>{
+            el.addEventListener('click',(e)=>{
+                const idx=parseInt(el.dataset.opt);
+                aplicarBonus(opciones[idx]);
+            });
+        });
+    }
+    
+    function aplicarBonus(opt){
+        if(bonusUsadoHoy){ alert("Ya usaste bonus hoy"); return; }
+        bonusUsadoHoy=true;
+        bonusDisponible=false;
+        dom.bonusContainer.style.display="none";
+        // Registrar día como completado con bonus
+        const hoy=new Date().toISOString().split('T')[0];
+        if(!historial.some(h=>h.fecha===hoy)){
+            historial.push({ fecha:hoy, total:ejerciciosHoy.length, bonus:opt.nombre });
+            localStorage.setItem("crabacode_historial_final", JSON.stringify(historial));
+            calcularRachas();
+            actualizarHistorialUI();
+        }
+        dom.hint.innerHTML = `🎁 Bonus "${opt.nombre}" aplicado. Día completado sin esfuerzo.`;
+        dom.completeBtn.innerText = "🏆 Bonus aplicado";
+        dom.startBtn.disabled = true;
+        // Sumar pequeña gamificación según tipo
+        if(opt.tipo==="zen") gamificacion.control+=1;
+        if(opt.tipo==="sangre") gamificacion.energia+=1;
+        actualizarEstadoVital();
+        setTimeout(()=>{ location.reload(); },1500);
+    }
+    
+    function reiniciarDia(){ if(confirm("¿Reiniciar el día?")){ pausarTimer(); cargarRutinaDelDia(); currentEjercicioIdx=0; completadosHoy=new Array(ejerciciosHoy.length).fill(false); actualizarChecklist(); cargarEjercicioActual(); bonusUsadoHoy=false; bonusDisponible=false; dom.bonusContainer.style.display="none"; dom.hint.innerText="🌅 Día reiniciado"; } }
+    
+    // Eventos
+    dom.startBtn.onclick=iniciarModo;
+    dom.resetTimerBtn.onclick=()=>{ if(!completadosHoy[currentEjercicioIdx]){ pausarTimer(); if(modoTime){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Reiniciado"; } else { repActual=0; dom.repCounter.innerText="0"; } } };
+    dom.completeBtn.onclick=completarYAvanzar;
+    dom.resetDayBtn.onclick=reiniciarDia;
+    dom.plusRepBtn.onclick=()=>actualizarContadorReps(1);
+    dom.minusRepBtn.onclick=()=>actualizarContadorReps(-1);
+    dom.resetRepsBtn.onclick=()=>{ repActual=0; dom.repCounter.innerText="0"; dom.hint.innerText=`Conteo reiniciado. Objetivo: ${objetivo} reps`; };
+    if(dom.touchLeftZone) dom.touchLeftZone.onclick=()=>actualizarContadorReps(-1);
+    if(dom.touchRightZone) dom.touchRightZone.onclick=()=>actualizarContadorReps(1);
+    
+    // Cargar historial guardado
+    const saved=localStorage.getItem("crabacode_historial_final");
+    if(saved){ historial=JSON.parse(saved); calcularRachas(); actualizarHistorialUI(); }
+    cargarRutinaDelDia();
     actualizarChecklist();
-    cargarEjercicio(0);
+    cargarEjercicioActual();
+    verificarBonusPorRacha();
 </script>
 </body>
 </html>
