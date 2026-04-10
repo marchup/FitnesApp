@@ -6,7 +6,7 @@
     <title>Marce Espartano</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* (Todo tu CSS original se mantiene IDÉNTICO hasta .cardio-actions) */
+        /* ========== TODO TU CSS ORIGINAL SE MANTIENE IGUAL ========== */
         * {
             margin: 0;
             padding: 0;
@@ -112,7 +112,6 @@
             padding-bottom: 5px;
         }
         
-        /* NUEVO ESTILO PARA EL CRONÓMETRO NOCTURNO */
         .cardio-bar-section {
             background: rgba(10, 5, 5, 0.85);
             border: 2px solid #b8860b;
@@ -189,12 +188,10 @@
         .bar-fill.completed {
             animation: goldGlow 0.5s ease-in-out 3;
         }
-        /* Ocultamos los botones viejos de +5, +10, +15 (ya no se usan) */
         .old-cardio-actions {
             display: none;
         }
         
-        /* El resto de tu CSS (vital-stats, card, etc.) se mantiene EXACTAMENTE IGUAL */
         .vital-stats {
             background: rgba(10, 5, 5, 0.85);
             border: 1px solid #b8860b;
@@ -386,6 +383,11 @@
             border-radius: 20px;
             background: #00000055;
             padding: 5px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .exercise-img:active {
+            transform: scale(0.98);
         }
         
         footer {
@@ -446,6 +448,46 @@
             width: 0%;
             height: 100%;
             transition: width 0.3s ease;
+        }
+
+        /* MODAL PARA IMAGEN GRANDE (nuevo) */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+        }
+        .image-modal-content {
+            max-width: 95%;
+            max-height: 85%;
+            text-align: center;
+        }
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 30px;
+            border: 3px solid #daa520;
+            box-shadow: 0 0 30px rgba(218, 165, 32, 0.5);
+        }
+        .image-modal-close {
+            margin-top: 25px;
+            background: #b8860b;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 60px;
+            color: black;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
         .modal {
@@ -672,11 +714,8 @@
 
     <div class="motd-phrase" id="dailyPhrase">"Esta es la pared, atraviésala"</div>
 
-    <!-- NUEVA SECCIÓN CARDIO NOCTURNO CON CRONÓMETRO -->
     <div class="cardio-bar-section">
         <div class="cardio-title">🌙 CARDIO NOCTURNO (Elíptica)</div>
-        
-        <!-- CRONÓMETRO PARA LA ELÍPTICA -->
         <div class="night-timer">
             <div class="night-timer-display" id="nightTimerDisplay">00:00</div>
             <div class="night-timer-buttons">
@@ -687,12 +726,8 @@
                 <button class="night-timer-btn add-minutes-btn" id="nightAddMinutesBtn">➕ SUMAR A LA BARRA</button>
             </div>
         </div>
-        
-        <!-- BARRA SEMANAL -->
         <div class="bar-container"><div class="bar-fill" id="cardioBarFill">0%</div></div>
-        <div class="old-cardio-actions">
-            <!-- Los botones viejos ya no se usan, pero los mantengo ocultos por si acaso -->
-        </div>
+        <div class="old-cardio-actions"></div>
     </div>
 
     <div class="vital-stats">
@@ -713,6 +748,7 @@
             <div class="target"><span class="reps" id="targetReps">4 min</span></div>
         </div>
         
+        <!-- IMAGEN CLICABLE para agrandar -->
         <img id="exerciseImg" class="exercise-img" src="1.png" alt="Ejercicio" onerror="this.style.display='none'">
         
         <div class="action-zone">
@@ -767,12 +803,7 @@
 </div>
 
 <script>
-    // ==================== TODO EL CÓDIGO JS ORIGINAL SE MANTIENE ====================
-    // Solo se añaden:
-    // 1) La función sumarMinutosACardio(m) que ya existía (agregarMinutosCardio)
-    // 2) La lógica del nuevo cronómetro nocturno
-    // 3) La suma automática del cardio matutino al completar el ejercicio
-    
+    // ==================== TODO EL CÓDIGO JS ORIGINAL (con las mejoras) ====================
     const canvas = document.getElementById('fireCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -834,10 +865,13 @@
     let historial = [];
     let rachaActual = 0;
     
-    // ---- NUEVO: Estado del cronómetro nocturno ----
+    // Estado del cronómetro nocturno
     let nightTimerSeconds = 0;
     let nightTimerActive = false;
     let nightTimerInterval = null;
+    
+    // Control para no duplicar suma de cardio matutino
+    let cardioSumadoEnEsteDia = {};
     
     const dom = {
         exTitle: document.getElementById("exTitle"), targetReps: document.getElementById("targetReps"),
@@ -858,7 +892,6 @@
         kegelProgressFill: document.getElementById("kegelProgressFill"), kegelMessage: document.getElementById("kegelMessage"),
         resetKegelBtn: document.getElementById("resetKegelBtn"), historyBtn: document.getElementById("historyBtn"),
         warPlanBtn: document.getElementById("warPlanBtn"),
-        // NUEVOS elementos del cronómetro nocturno
         nightTimerDisplay: document.getElementById("nightTimerDisplay"),
         nightTimerStartPause: document.getElementById("nightTimerStartPause"),
         nightTimerReset: document.getElementById("nightTimerReset"),
@@ -911,23 +944,30 @@
     
     function resetCardioSemanal(){ if(confirm("¿Reiniciar barra?")){ cardioSemanal=0; bonusCardioUsado=false; localStorage.setItem("marce_cardio_semanal","0"); actualizarBarraCardio(); dom.hint.innerHTML="Barra reiniciada."; } }
     
-    // NUEVA FUNCIÓN: Actualizar display del cronómetro nocturno
+    function sumarCardioMatutinoASemanal(minutos) {
+        if (minutos < 1) return;
+        if (minutos > MAX_POR_SESION) minutos = MAX_POR_SESION;
+        cardioSemanal += minutos;
+        localStorage.setItem("marce_cardio_semanal", cardioSemanal);
+        actualizarBarraCardio();
+        playBeep();
+        vibrateShort();
+        dom.hint.innerHTML = `⚔️ +${minutos} min (Cardio matutino). Total: ${cardioSemanal}/${OBJETIVO_SEMANAL}`;
+    }
+    
     function updateNightTimerDisplay() {
         let mins = Math.floor(nightTimerSeconds / 60);
         let secs = nightTimerSeconds % 60;
         dom.nightTimerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     
-    // NUEVA FUNCIÓN: Iniciar/Pausar cronómetro nocturno
     function toggleNightTimer() {
         if (nightTimerActive) {
-            // Pausar
             if (nightTimerInterval) clearInterval(nightTimerInterval);
             nightTimerActive = false;
             dom.nightTimerStartPause.innerText = "▶ INICIAR";
             dom.nightAddMinutesContainer.style.display = "block";
         } else {
-            // Iniciar
             nightTimerActive = true;
             nightTimerInterval = setInterval(() => {
                 nightTimerSeconds++;
@@ -938,7 +978,6 @@
         }
     }
     
-    // NUEVA FUNCIÓN: Reiniciar cronómetro nocturno
     function resetNightTimer() {
         if (nightTimerInterval) clearInterval(nightTimerInterval);
         nightTimerActive = false;
@@ -948,7 +987,6 @@
         dom.nightAddMinutesContainer.style.display = "none";
     }
     
-    // NUEVA FUNCIÓN: Sumar minutos del cronómetro a la barra
     function addNightTimerToBar() {
         if (nightTimerSeconds < 60) {
             alert("Mínimo 1 minuto para sumar a la barra");
@@ -963,26 +1001,28 @@
         resetNightTimer();
     }
     
-    // MODIFICACIÓN IMPORTANTE: Al completar un ejercicio de cardio matutino, suma sus minutos a la barra
-    // Se agrega dentro de completarYAvanzar() cuando se completa un ejercicio de tipo "cardio"
-    // También se añade una protección para no sumar dos veces el mismo ejercicio
-    
-    // Variable para controlar qué ejercicios de cardio ya sumaron minutos (para no duplicar)
-    let cardioSumadoEnEsteDia = {};
-    
-    // Función para sumar cardio matutino a la barra (se llama desde completarYAvanzar)
-    function sumarCardioMatutinoASemanal(minutos) {
-        if (minutos < 1) return;
-        if (minutos > MAX_POR_SESION) minutos = MAX_POR_SESION;
-        cardioSemanal += minutos;
-        localStorage.setItem("marce_cardio_semanal", cardioSemanal);
-        actualizarBarraCardio();
-        playBeep();
-        vibrateShort();
-        dom.hint.innerHTML = `⚔️ +${minutos} min (Cardio matutino). Total: ${cardioSemanal}/${OBJETIVO_SEMANAL}`;
+    // NUEVA FUNCIÓN: Mostrar imagen en grande
+    function showFullImage(imgSrc) {
+        let modal = document.createElement('div');
+        modal.className = 'image-modal';
+        modal.innerHTML = `
+            <div class="image-modal-content">
+                <img src="${imgSrc}" alt="Ejercicio ampliado">
+                <div style="margin-top: 20px;">
+                    <button class="image-modal-close">CERRAR</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        // Cerrar al hacer clic fuera de la imagen o en el botón
+        modal.onclick = (e) => {
+            if (e.target === modal || e.target.classList.contains('image-modal-close')) {
+                modal.remove();
+            }
+        };
     }
     
-    // ==================== RESTO DE FUNCIONES ORIGINALES (sin cambios) ====================
+    // ==================== RESTO DE FUNCIONES ORIGINALES ====================
     function cargarRutinaDelDia(){
         const dia = new Date().getDay();
         const tipo = tiposDia[dia];
@@ -990,7 +1030,6 @@
         ejerciciosHoy = tipo.ejercicios.map(key => ({...ejerciciosDB[key]}));
         completadosHoy = new Array(ejerciciosHoy.length).fill(false);
         dom.totalToday.innerText = ejerciciosHoy.length;
-        // Resetear el control de cardio sumado al cargar un nuevo día
         cardioSumadoEnEsteDia = {};
     }
     
@@ -1308,7 +1347,6 @@
         document.getElementById('closePlanBtn').onclick = () => modal.remove();
     }
     
-    // FUNCIÓN MODIFICADA: completarYAvanzar (ahora suma cardio matutino a la barra)
     function completarYAvanzar(){
         if(completadosHoy[currentEjercicioIdx]){ avanzarSiguiente(); return; }
         const ex = ejerciciosHoy[currentEjercicioIdx];
@@ -1316,7 +1354,7 @@
         if(!alcanzado && !confirm(`¿Completar igual?`)) return;
         if(alcanzado){ vibrateShort(); playBeep(); }
         
-        // NUEVO: Si el ejercicio es CARDIO y estamos en modo tiempo (cardio matutino), sumar minutos a la barra semanal
+        // Sumar cardio matutino a la barra semanal (solo una vez por ejercicio)
         if (ex.nombre.includes("CARDIO") && modoTime && !cardioSumadoEnEsteDia[currentEjercicioIdx]) {
             let minutosCardio = Math.floor(objetivo / 60);
             if (minutosCardio < 1) minutosCardio = 1;
@@ -1393,7 +1431,7 @@
     function reiniciarDia(){ if(confirm("¿Reiniciar el día?")){ cargarRutinaDelDia(); currentEjercicioIdx=0; completadosHoy.fill(false); actualizarChecklist(); cargarEjercicioActual(); } }
     function resetKegel(){ if(!completadosHoy[currentEjercicioIdx] && ejerciciosHoy[currentEjercicioIdx]?.esKegel){ detenerKegels(); kegelSegundosRestantes=0; dom.kegelProgressFill.style.width="0%"; dom.kegelStatusText.innerText="REINICIADO"; dom.kegelMessage.innerText="Toca INICIAR"; activo=false; dom.startBtn.innerText="▶ INICIAR"; } }
     
-    // ==================== ASIGNACIÓN DE EVENTOS ====================
+    // ==================== EVENTOS ====================
     dom.startBtn.onclick = iniciarModo;
     dom.resetTimerBtn.onclick = () => { if(!completadosHoy[currentEjercicioIdx] && modoTime && !ejerciciosHoy[currentEjercicioIdx]?.esKegel){ tiempoActual=0; dom.timerDisplay.innerText="00:00"; dom.hint.innerText="Reiniciado"; } };
     dom.completeBtn.onclick = completarYAvanzar;
@@ -1407,10 +1445,22 @@
     if(dom.historyBtn) dom.historyBtn.onclick = mostrarHistorial;
     if(dom.warPlanBtn) dom.warPlanBtn.onclick = mostrarPlanDeGuerra;
     
-    // Eventos del nuevo cronómetro nocturno
+    // Eventos del cronómetro nocturno
     if(dom.nightTimerStartPause) dom.nightTimerStartPause.onclick = toggleNightTimer;
     if(dom.nightTimerReset) dom.nightTimerReset.onclick = resetNightTimer;
     if(dom.nightAddMinutesBtn) dom.nightAddMinutesBtn.onclick = addNightTimerToBar;
+    
+    // Evento para agrandar la imagen del ejercicio al hacer clic
+    if(dom.exerciseImg) {
+        dom.exerciseImg.onclick = () => {
+            const imgSrc = dom.exerciseImg.src;
+            if (imgSrc && !imgSrc.includes('null') && imgSrc !== window.location.href) {
+                showFullImage(imgSrc);
+            } else {
+                alert("Imagen no disponible");
+            }
+        };
+    }
     
     // Cargar datos guardados
     const savedCardio = localStorage.getItem("marce_cardio_semanal");
